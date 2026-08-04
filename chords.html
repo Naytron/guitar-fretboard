@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guitar Chords — accurate notes by interval, any root</title>
+  <meta name="description" content="An interactive guitar chord diagram. Pick a root and see major, minor, dominant, diminished, suspended, added, and augmented chords across the whole neck — every tone colored by interval. Notes are computed, not copied." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Diagrams">
+      <a href="index.html">Scales</a>
+      <a href="chords.html" class="active" aria-current="page">Chords</a>
+    </nav>
+    <h1>🎸 Guitar Chords</h1>
+    <p class="tagline">
+      Pick a root — see every chord quality across the neck with each tone
+      <strong>colored by interval</strong> (root · 3rd · 5th · 7th · extension).
+      Note names are computed from standard tuning (E A D G B E), not copied from anywhere.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Controls">
+      <div class="control">
+        <label for="root">Root</label>
+        <select id="root"></select>
+      </div>
+      <div class="control">
+        <label for="frets">Frets: <span id="frets-out">12</span></label>
+        <input type="range" id="frets" min="12" max="15" step="1" value="12" />
+      </div>
+      <div class="control">
+        <label for="spelling">Spelling</label>
+        <select id="spelling">
+          <option value="auto" selected>Auto (by key)</option>
+          <option value="sharps">Sharps ♯</option>
+          <option value="flats">Flats ♭</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="label-mode">Dot labels</label>
+        <select id="label-mode">
+          <option value="notes" selected>Note names</option>
+          <option value="intervals">Intervals</option>
+          <option value="both">Both</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="legend" aria-label="Interval legend">
+      <span class="key"><span class="swatch cat-root"></span> Root</span>
+      <span class="key"><span class="swatch cat-third"></span> 3rd (3 / ♭3)</span>
+      <span class="key"><span class="swatch cat-fifth"></span> 5th (5 / ♭5 / ♯5)</span>
+      <span class="key"><span class="swatch cat-seventh"></span> 7th (♭7 / ♭♭7)</span>
+      <span class="key"><span class="swatch cat-ext"></span> Extension (2 / 4 / 9)</span>
+    </section>
+
+    <section id="gallery" class="gallery" aria-label="Chord diagrams"></section>
+
+    <p id="selftest" class="selftest" role="status"></p>
+
+    <section class="about">
+      <h2>About this diagram</h2>
+      <p>
+        Choose a root and this shows the common chord <em>qualities</em> built on it — the
+        <strong>major, minor, dominant, diminished, suspended, added, and augmented</strong>
+        families — each drawn across the whole neck. Every place a chord tone appears is marked and
+        <strong>colored by its interval</strong>, so you can see the shape of a chord instead of
+        memorizing a single box.
+      </p>
+      <p>
+        The notes are <strong>calculated</strong> from the open-string tuning
+        (<code>note = (open + fret) mod 12</code>) and each tone is labelled with its true interval
+        (so an add9's ninth reads <code>9</code> and a diminished 7th reads <code>♭♭7</code>).
+        Spelling follows the selected key; nothing here is reproduced from copyrighted sheet music.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built as an interactive companion to my personal guitar library. All code &amp; note data original.</p>
+  </footer>
+
+  <script src="fretboard.engine.js"></script>
+  <script src="chords.js"></script>
+</body>
+</html>

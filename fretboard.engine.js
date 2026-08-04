@@ -44,6 +44,40 @@ const SCALES = {
   chromatic:        { name: 'Chromatic (all notes)', steps: [0,1,2,3,4,5,6,7,8,9,10,11], family: 'major' },
 };
 
+/* ---- Chord qualities (for the chords diagram) ----
+ * Each chord carries `steps` (semitones from root) and a parallel `labels`
+ * array giving the correct interval name for each tone, so add9's 2-semitone
+ * tone reads "9" and dim7's 9-semitone tone reads "♭♭7" (not raw semitones).
+ * `family` drives sharp/flat spelling exactly like the scales do.
+ */
+const CHORDS = {
+  major:      { name: 'Major',        symbol: '',     steps: [0, 4, 7],     labels: ['R', '3', '5'],           family: 'major', group: 'Triads' },
+  minor:      { name: 'Minor',        symbol: 'm',    steps: [0, 3, 7],     labels: ['R', '♭3', '5'],          family: 'minor', group: 'Triads' },
+  diminished: { name: 'Diminished',   symbol: 'dim',  steps: [0, 3, 6],     labels: ['R', '♭3', '♭5'],         family: 'minor', group: 'Triads' },
+  augmented:  { name: 'Augmented',    symbol: 'aug',  steps: [0, 4, 8],     labels: ['R', '3', '♯5'],          family: 'major', group: 'Triads' },
+  dom7:       { name: 'Dominant 7',   symbol: '7',    steps: [0, 4, 7, 10], labels: ['R', '3', '5', '♭7'],     family: 'major', group: 'Sevenths' },
+  dim7:       { name: 'Diminished 7', symbol: '°7',   steps: [0, 3, 6, 9],  labels: ['R', '♭3', '♭5', '♭♭7'], family: 'minor', group: 'Sevenths' },
+  sus2:       { name: 'Sus2',         symbol: 'sus2', steps: [0, 2, 7],     labels: ['R', '2', '5'],           family: 'major', group: 'Suspended & added' },
+  sus4:       { name: 'Sus4',         symbol: 'sus4', steps: [0, 5, 7],     labels: ['R', '4', '5'],           family: 'major', group: 'Suspended & added' },
+  add9:       { name: 'Add9',         symbol: 'add9', steps: [0, 4, 7, 2],  labels: ['R', '3', '5', '9'],      family: 'major', group: 'Suspended & added' },
+};
+
+/* Map an interval label to a color category used by the chords diagram. */
+function intervalCategory(label) {
+  if (label === 'R') return 'root';
+  if (label === '3' || label === '♭3') return 'third';
+  if (label === '5' || label === '♭5' || label === '♯5') return 'fifth';
+  if (label === '7' || label === '♭7' || label === '♭♭7') return 'seventh';
+  return 'ext';
+}
+
+/* Build a pitch-class → interval-label map for a chord rooted at rootPc. */
+function chordIntervals(rootPc, chord) {
+  const map = new Map();
+  chord.steps.forEach((s, i) => map.set((rootPc + s) % 12, chord.labels[i]));
+  return map;
+}
+
 /*
  * Enharmonic preference. For a given key, decide whether note names should
  * read with sharps or flats — the same choice a printed fretboard chart makes
@@ -108,7 +142,44 @@ function runSelfTest() {
   return { passed, results };
 }
 
+/* ---- Chord self-test: prove the chord spellings are correct ---- */
+function runChordSelfTest() {
+  const results = [];
+  const check = (label, got, want) => results.push({ label, ok: got === want, got, want });
+
+  // rootPc, chord key, expected spelled notes (hand-verified, auto spelling by key)
+  const cases = [
+    [0, 'major',      'C E G'],
+    [9, 'minor',      'A C E'],
+    [7, 'dom7',       'G B D F'],
+    [3, 'major',      'E♭ G B♭'],   // flat-root chord spells with flats
+    [0, 'augmented',  'C E G♯'],
+    [11, 'diminished','B D F'],
+    [0, 'dim7',       'C E♭ G♭ A'], // dim family → flats (relative-major E♭)
+    [2, 'sus2',       'D E A'],
+    [2, 'sus4',       'D G A'],
+    [0, 'add9',       'C E G D'],
+  ];
+
+  cases.forEach(([rootPc, key, want]) => {
+    const chord = CHORDS[key];
+    const flats = keyPrefersFlats(rootPc, chord.family);
+    const got = chord.steps.map((s) => nameFor((rootPc + s) % 12, flats)).join(' ');
+    check(`${nameFor(rootPc, flats)} ${chord.name}`, got, want);
+  });
+
+  const passed = results.every((r) => r.ok);
+  results.forEach((r) => {
+    if (!r.ok) console.error(`Chord self-test FAILED: ${r.label} → got "${r.got}", want "${r.want}"`);
+  });
+  return { passed, results };
+}
+
 /* Expose for Node-based testing while staying browser-friendly */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { SHARP, FLAT, STRINGS, SCALES, keyPrefersFlats, nameFor, scaleSet, noteAt, runSelfTest };
+  module.exports = {
+    SHARP, FLAT, STRINGS, SCALES, CHORDS,
+    keyPrefersFlats, nameFor, scaleSet, noteAt,
+    intervalCategory, chordIntervals, runSelfTest, runChordSelfTest,
+  };
 }
