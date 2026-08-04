@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guitar Fretboard — accurate notes, any scale</title>
+  <meta name="description" content="An interactive guitar fretboard that shows the accurate note names for any scale, mode, or chord. Defaults to the G major scale." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>🎸 Guitar Fretboard</h1>
+    <p class="tagline">
+      Pick a root and a scale — see the <strong>accurate notes</strong> across the neck.
+      Every note is computed from standard tuning (E A D G B E), not copied from anywhere.
+    </p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Controls">
+      <div class="control">
+        <label for="root">Root</label>
+        <select id="root"></select>
+      </div>
+      <div class="control">
+        <label for="scale">Scale / chord</label>
+        <select id="scale"></select>
+      </div>
+      <div class="control">
+        <label for="frets">Frets: <span id="frets-out">15</span></label>
+        <input type="range" id="frets" min="12" max="24" step="1" value="15" />
+      </div>
+      <div class="control">
+        <label for="spelling">Spelling</label>
+        <select id="spelling">
+          <option value="auto" selected>Auto (by key)</option>
+          <option value="sharps">Sharps ♯</option>
+          <option value="flats">Flats ♭</option>
+        </select>
+      </div>
+      <div class="control control-check">
+        <input type="checkbox" id="show-all" />
+        <label for="show-all">Show every note (dim out-of-scale)</label>
+      </div>
+    </section>
+
+    <section class="readout" aria-live="polite">
+      <span id="scale-title" class="scale-title">G Major (Ionian)</span>
+      <span id="scale-notes" class="scale-notes"></span>
+    </section>
+
+    <section class="legend" aria-label="Legend">
+      <span class="key"><span class="swatch root"></span> Root</span>
+      <span class="key"><span class="swatch in-scale"></span> Scale tone</span>
+      <span class="key"><span class="swatch ghost"></span> Out of scale (when shown)</span>
+    </section>
+
+    <section id="fretboard" class="fretboard" aria-label="Fretboard"></section>
+
+    <p id="selftest" class="selftest" role="status"></p>
+
+    <section class="about">
+      <h2>About this demo</h2>
+      <p>
+        This is a small, original demo that turns a scale diagram (the kind on a printed
+        <em>“G Major Scale — Fretboard”</em> sheet) into an interactive web page. It defaults to
+        <strong>G major</strong> — G A B C D E F♯ — and works for any root, mode, or basic chord.
+      </p>
+      <p>
+        The note names are <strong>calculated</strong> from the open-string tuning by simple
+        chromatic math (<code>note = (open + fret) mod 12</code>) and spelled with sharps or flats
+        to match the selected key. Nothing here is reproduced from copyrighted sheet music.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built as an interactive companion to my personal guitar library. All code &amp; note data original.</p>
+  </footer>
+
+  <script src="fretboard.engine.js"></script>
+  <script src="fretboard.js"></script>
+</body>
+</html>

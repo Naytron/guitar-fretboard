@@ -1,0 +1,16 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
+
+# Never publish source media / documents to this public demo
+*.pdf
+*.mp3
+*.wav
+
+# Scratch
+/tmp/
+*.tmp
