@@ -3,84 +3,246 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guitar Chords — accurate notes by interval, any root</title>
-  <meta name="description" content="An interactive guitar chord diagram. Pick a root and see major, minor, dominant, diminished, suspended, added, and augmented chords across the whole neck — every tone colored by interval. Notes are computed, not copied." />
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <title>Fretboard Lab — compare guitar chord qualities</title>
+  <meta name="description" content="Compare major, minor, dominant, diminished, suspended, added, and augmented guitar chord tones across the whole fretboard." />
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+  </style>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#workspace">Skip to chord controls</a>
+
   <header class="site-header">
-    <nav class="site-nav" aria-label="Diagrams">
-      <a href="index.html">Scales</a>
-      <a href="chords.html" class="active" aria-current="page">Chords</a>
-    </nav>
-    <h1>🎸 Guitar Chords</h1>
-    <p class="tagline">
-      Pick a root — see every chord quality across the neck with each tone
-      <strong>colored by interval</strong> (root · 3rd · 5th · 7th · extension).
-      Note names are computed from standard tuning (E A D G B E), not copied from anywhere.
-    </p>
+    <div class="topbar">
+      <a class="brand" href="index.html" aria-label="Fretboard Lab home">
+        <span class="brand-pick" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="brand-copy">
+          <strong>Fretboard Lab</strong>
+          <small>Guitar theory, made visible</small>
+        </span>
+      </a>
+
+      <nav class="site-nav" aria-label="Diagram type">
+        <a href="index.html">
+          <span class="nav-number">01</span> Scales
+        </a>
+        <a href="chords.html" class="active" aria-current="page">
+          <span class="nav-number">02</span> Chords
+        </a>
+      </nav>
+
+      <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Standard</span>
+        <strong>E A D G B E</strong>
+      </div>
+    </div>
+
+    <div class="hero hero-chords">
+      <div class="hero-copy">
+        <h1>One root.<br /><em>Every color.</em></h1>
+        <p class="tagline">
+          Compare chord qualities without losing your place on the neck. See how thirds, fifths,
+          sevenths, and extensions reshape the sound—note by note.
+        </p>
+      </div>
+
+      <div class="hero-instrument" aria-hidden="true">
+        <div class="pick-display">
+          <span class="pick-shape pick-chord"><span class="pick-hole"></span></span>
+          <p><strong>Change one interval.</strong><br />Hear a whole new character.</p>
+        </div>
+        <div class="neck-sculpture chord-sculpture">
+          <span class="mini-fret fret-1"></span>
+          <span class="mini-fret fret-2"></span>
+          <span class="mini-fret fret-3"></span>
+          <span class="mini-fret fret-4"></span>
+          <span class="mini-string string-1"></span>
+          <span class="mini-string string-2"></span>
+          <span class="mini-string string-3"></span>
+          <span class="mini-string string-4"></span>
+          <span class="mini-string string-5"></span>
+          <span class="mini-string string-6"></span>
+          <span class="mini-note note-a"></span>
+          <span class="mini-note note-b"></span>
+          <span class="mini-note note-c"></span>
+          <span class="mini-note note-d"></span>
+        </div>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <section class="controls" aria-label="Controls">
-      <div class="control">
-        <label for="root">Root</label>
-        <select id="root"></select>
+  <main id="workspace" class="workspace">
+    <section class="control-deck" aria-labelledby="setup-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="setup-heading">Choose your root</h2>
+          <p>Set the root, fret range, spelling, and label style. Every chord updates together.</p>
+        </div>
       </div>
-      <div class="control">
-        <label for="frets">Frets: <span id="frets-out">12</span></label>
-        <input type="range" id="frets" min="12" max="15" step="1" value="12" />
-      </div>
-      <div class="control">
-        <label for="spelling">Spelling</label>
-        <select id="spelling">
-          <option value="auto" selected>Auto (by key)</option>
-          <option value="sharps">Sharps ♯</option>
-          <option value="flats">Flats ♭</option>
-        </select>
-      </div>
-      <div class="control">
-        <label for="label-mode">Dot labels</label>
-        <select id="label-mode">
-          <option value="notes" selected>Note names</option>
-          <option value="intervals">Intervals</option>
-          <option value="both">Both</option>
-        </select>
+
+      <div class="controls chord-controls" aria-label="Chord controls">
+        <div class="control control-primary">
+          <label for="root">
+            <span class="control-label">Root note</span>
+            <span class="control-help">One root, nine qualities</span>
+          </label>
+          <select id="root"></select>
+        </div>
+        <div class="control control-range">
+          <label for="frets">
+            <span class="control-label">Fret range</span>
+            <span class="control-value"><span id="frets-out">12</span> frets</span>
+          </label>
+          <input type="range" id="frets" min="12" max="15" step="1" value="12" />
+          <div class="range-ends" aria-hidden="true"><span>12</span><span>15</span></div>
+        </div>
+        <div class="control">
+          <label for="spelling">
+            <span class="control-label">Note spelling</span>
+            <span class="control-help">Sharps or flats</span>
+          </label>
+          <select id="spelling">
+            <option value="auto" selected>Auto (by key)</option>
+            <option value="sharps">Sharps ♯</option>
+            <option value="flats">Flats ♭</option>
+          </select>
+        </div>
+        <div class="control control-primary">
+          <label for="label-mode">
+            <span class="control-label">Dot labels</span>
+            <span class="control-help">Notes, intervals, or both</span>
+          </label>
+          <select id="label-mode">
+            <option value="notes" selected>Note names</option>
+            <option value="intervals">Intervals</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
       </div>
     </section>
 
-    <section class="legend" aria-label="Interval legend">
-      <span class="key"><span class="swatch cat-root"></span> Root</span>
-      <span class="key"><span class="swatch cat-third"></span> 3rd (3 / ♭3)</span>
-      <span class="key"><span class="swatch cat-fifth"></span> 5th (5 / ♭5 / ♯5)</span>
-      <span class="key"><span class="swatch cat-seventh"></span> 7th (♭7 / ♭♭7)</span>
-      <span class="key"><span class="swatch cat-ext"></span> Extension (2 / 4 / 9)</span>
+    <section class="instrument-stage chord-stage" aria-labelledby="atlas-heading">
+      <header class="stage-header">
+        <div>
+          <h2 id="atlas-heading">Chord quality atlas</h2>
+          <p class="stage-description">Each color represents a job inside the chord, not just a note name.</p>
+        </div>
+        <div class="legend interval-legend" aria-label="Interval color legend">
+          <span class="key"><span class="swatch cat-root"></span> Root</span>
+          <span class="key"><span class="swatch cat-third"></span> 3rd</span>
+          <span class="key"><span class="swatch cat-fifth"></span> 5th</span>
+          <span class="key"><span class="swatch cat-seventh"></span> 7th</span>
+          <span class="key"><span class="swatch cat-ext"></span> Extension</span>
+        </div>
+      </header>
+
+      <section id="gallery" class="gallery" aria-label="Chord diagrams"></section>
+
+      <footer class="stage-footer">
+        <p id="selftest" class="selftest" role="status"></p>
+        <p class="math-note"><span aria-hidden="true">⌁</span> Every chord is generated from its interval formula.</p>
+      </footer>
     </section>
 
-    <section id="gallery" class="gallery" aria-label="Chord diagrams"></section>
-
-    <p id="selftest" class="selftest" role="status"></p>
-
-    <section class="about">
-      <h2>About this diagram</h2>
-      <p>
-        Choose a root and this shows the common chord <em>qualities</em> built on it — the
-        <strong>major, minor, dominant, diminished, suspended, added, and augmented</strong>
-        families — each drawn across the whole neck. Every place a chord tone appears is marked and
-        <strong>colored by its interval</strong>, so you can see the shape of a chord instead of
-        memorizing a single box.
-      </p>
-      <p>
-        The notes are <strong>calculated</strong> from the open-string tuning
-        (<code>note = (open + fret) mod 12</code>) and each tone is labelled with its true interval
-        (so an add9's ninth reads <code>9</code> and a diminished 7th reads <code>♭♭7</code>).
-        Spelling follows the selected key; nothing here is reproduced from copyrighted sheet music.
-      </p>
+    <section class="practice-panel" aria-labelledby="practice-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="practice-heading">Understand what changes the sound</h2>
+          <p>Compare the same root while one interval changes at a time.</p>
+        </div>
+      </div>
+      <ul class="practice-steps concept-list">
+        <li>
+          <span class="step-number">3rd</span>
+          <div>
+            <h3>Major or minor</h3>
+            <p>The third defines the chord's core mood. Compare 3 against ♭3 across the neck.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-number">5th</span>
+          <div>
+            <h3>Stable or altered</h3>
+            <p>Lower or raise the fifth to reveal diminished and augmented tension.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-number">7+</span>
+          <div>
+            <h3>Color and movement</h3>
+            <p>Sevenths and extensions add pull, atmosphere, and harmonic direction.</p>
+          </div>
+        </li>
+      </ul>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>Built as an interactive companion to my personal guitar library. All code &amp; note data original.</p>
+    <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
+    <p>Original note engine · Standard tuning · Built for focused practice</p>
   </footer>
 
   <script src="fretboard.engine.js"></script>
