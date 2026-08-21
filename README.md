@@ -9,8 +9,10 @@ There are **two diagrams**:
 - **Chords** (`chords.html`) — pick a root and see the major, minor, dominant, diminished,
   suspended, added, and augmented chords as full-neck maps, every tone **colored by interval**.
 
-**▶ Live demo:** https://naytron.github.io/guitar-fretboard/ &nbsp;·&nbsp;
-**Chords:** https://naytron.github.io/guitar-fretboard/chords.html
+**▶ Azure production:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/ &nbsp;·&nbsp;
+**Chords:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/chords.html
+
+**GitHub Pages rollback:** https://naytron.github.io/guitar-fretboard/
 
 ## What it does
 - Pick a **root** and a **scale/mode/chord**; the fretboard highlights the notes.
@@ -33,11 +35,35 @@ open string (octave), **G major = G A B C D E F♯**, the low‑E string reads *
 frets 0–5, and **F major = F G A B♭ C D E**.
 
 ## Run it locally
-It's plain HTML/CSS/JS with **no build step and no dependencies** — just open `index.html`, or:
+The application is plain HTML/CSS/JS with **no runtime dependencies**. Open `index.html` directly,
+or run the same accuracy tests and versioned packaging used by continuous integration:
 
-```bash
-python -m http.server 8000   # then visit http://localhost:8000
+```powershell
+npm ci
+npm test
+npm run build
+python -m http.server 8000 --directory dist
 ```
+
+Then visit http://localhost:8000. The footer and `version.json` identify the exact packaged
+version.
+
+## Continuous integration and Azure deployment
+
+- `.github/workflows/ci.yml` tests every pull request and `main` push, creates a deployment label
+  such as `v1.0.0+309bc9b`, and uploads the verified `dist/` artifact.
+- `.github/workflows/deploy.yml` is a reusable production workflow. A successful `main` CI run
+  passes it the exact tested artifact, labels the deployment with the same version, deploys to
+  Azure Static Web Apps, and smoke-tests both pages plus `version.json`.
+- `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
+- `.azure/deployment-plan.md` records the Azure context, validation evidence, and rollback plan.
+
+The Azure deployment token is stored only as the
+`AZURE_STATIC_WEB_APPS_API_TOKEN` GitHub secret. GitHub Pages remains available as the rollback
+host while the Azure endpoint is validated.
+
+Production runs on Azure Static Web Apps Free in `rg-fretboard-lab-prod` (West US 2), with an
+expected hosting cost of $0/month for this personal-site workload.
 
 ## The chords diagram
 Open **Chords** (or `chords.html`) and pick a root — it draws each chord quality on its own
@@ -57,9 +83,14 @@ C aug = C E G♯, C dim7 = C E♭ G♭ A).
 | `index.html` | Scales page + controls |
 | `chords.html` | Chords page (interval-colored, full-neck) |
 | `styles.css` | Fretboard + UI styling (both pages) |
+| `theme.js` | Applies the light/dark theme before rendering |
 | `fretboard.engine.js` | Pure note engine (tuning, chromatic math, key-aware spelling, scale **and chord** formulas) + self-tests |
 | `fretboard.js` | Renders the scales neck |
 | `chords.js` | Renders the chords gallery |
+| `staticwebapp.config.json` | Azure Static Web Apps security headers |
+| `scripts/` | Accuracy tests, deterministic packaging, and deployment-boundary verification |
+| `.github/workflows/` | Continuous integration and version-labeled production deployment |
+| `azure.yaml`, `infra/` | Azure Developer CLI and Bicep infrastructure |
 
 ## Notes on originality
 All code and note data here are **original** and computed from music theory first principles. This

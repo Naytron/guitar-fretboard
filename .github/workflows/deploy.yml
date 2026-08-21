@@ -1,0 +1,109 @@
+name: Production Deployment
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: Exact CI artifact to deploy
+        required: true
+        type: string
+      version:
+        description: Immutable deployment version label
+        required: true
+        type: string
+    secrets:
+      AZURE_STATIC_WEB_APPS_API_TOKEN:
+        description: Azure Static Web Apps deployment token
+        required: true
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: azure-static-web-apps-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Azure ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ steps.azure_deploy.outputs.static_web_app_url }}
+    steps:
+      - name: Download tested artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: dist/
+
+      - name: Verify artifact version
+        shell: bash
+        env:
+          EXPECTED_VERSION: ${{ inputs.version }}
+        run: |
+          actual_version="$(node -p "require('./dist/version.json').version")"
+          if [[ "$actual_version" != "$EXPECTED_VERSION" ]]; then
+            echo "Artifact version $actual_version does not match $EXPECTED_VERSION." >&2
+            exit 1
+          fi
+          grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/index.html
+          grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/chords.html
+
+      - name: Deploy ${{ inputs.version }} to Azure
+        id: azure_deploy
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: dist
+          api_location: ""
+          output_location: ""
+          skip_app_build: true
+
+      - name: Smoke-test deployed version
+        shell: bash
+        env:
+          EXPECTED_VERSION: ${{ inputs.version }}
+          SITE_URL: ${{ steps.azure_deploy.outputs.static_web_app_url }}
+        run: |
+          site_url="${SITE_URL%/}"
+          if [[ "$site_url" != https://* ]]; then
+            echo "Azure deployment did not return an HTTPS site URL." >&2
+            exit 1
+          fi
+
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error --location \
+              "${site_url}/version.json" --output deployed-version.json; then
+              break
+            fi
+            if [[ "$attempt" -eq 12 ]]; then
+              echo "Azure site did not become ready." >&2
+              exit 1
+            fi
+            sleep 10
+          done
+
+          actual_version="$(node -p "require('./deployed-version.json').version")"
+          if [[ "$actual_version" != "$EXPECTED_VERSION" ]]; then
+            echo "Azure reports $actual_version instead of $EXPECTED_VERSION." >&2
+            exit 1
+          fi
+          curl --fail --silent --show-error --location "${site_url}/index.html" |
+            grep --fixed-strings --quiet 'id="selftest"'
+          curl --fail --silent --show-error --location "${site_url}/chords.html" |
+            grep --fixed-strings --quiet 'id="selftest"'
+
+      - name: Summarize deployment
+        shell: bash
+        run: |
+          {
+            echo "### Azure production deployment"
+            echo
+            echo "- Version: \`${{ inputs.version }}\`"
+            echo "- Artifact: \`${{ inputs.artifact_name }}\`"
+            echo "- URL: ${{ steps.azure_deploy.outputs.static_web_app_url }}"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,103 @@
+name: Continuous Integration
+run-name: CI ${{ github.ref_name }} at ${{ github.sha }}
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      artifact_name: ${{ steps.version.outputs.artifact_name }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          lfs: false
+          submodules: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Label build version
+        id: version
+        shell: bash
+        run: |
+          package_version="$(node -p "require('./package.json').version")"
+          if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "package.json must contain a stable semantic version." >&2
+            exit 1
+          fi
+          short_sha="${GITHUB_SHA::7}"
+          deploy_version="v${package_version}+${short_sha}"
+          artifact_name="fretboard-lab-${deploy_version}"
+          echo "version=${deploy_version}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=${artifact_name}" >> "$GITHUB_OUTPUT"
+          echo "DEPLOY_VERSION=${deploy_version}" >> "$GITHUB_ENV"
+          echo "COMMIT_SHA=${GITHUB_SHA}" >> "$GITHUB_ENV"
+
+      - name: Run accuracy and syntax tests
+        run: npm test
+
+      - name: Build versioned static artifact
+        run: npm run build
+
+      - name: Verify deployment boundary
+        run: npm run verify:dist
+
+      - name: Upload tested artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.version.outputs.artifact_name }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 9
+
+      - name: Summarize build
+        shell: bash
+        run: |
+          {
+            echo "### Tested deployment artifact"
+            echo
+            echo "- Version: \`${{ steps.version.outputs.version }}\`"
+            echo "- Artifact: \`${{ steps.version.outputs.artifact_name }}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: Deploy ${{ needs.build.outputs.version }}
+    needs: build
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      artifact_name: ${{ needs.build.outputs.artifact_name }}
+      version: ${{ needs.build.outputs.version }}
+    secrets:
+      AZURE_STATIC_WEB_APPS_API_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}

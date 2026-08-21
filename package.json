@@ -1,0 +1,14 @@
+{
+  "name": "fretboard-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency-free interactive guitar scale and chord fretboards.",
+  "engines": {
+    "node": ">=22 <26"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/test.mjs",
+    "verify:dist": "node scripts/verify-dist.mjs"
+  }
+}
