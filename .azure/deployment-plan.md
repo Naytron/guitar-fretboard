@@ -2,7 +2,7 @@
 
 ## Status
 
-Deployed - Verifying CI/CD
+Deployed
 
 ## Application
 
@@ -147,8 +147,8 @@ will show the base package version.
 - [x] Configure the GitHub deployment secret without exposing it.
 - [x] Verify both pages, assets, navigation, responsive behavior, and accuracy badges on Azure.
 - [x] Record the Azure hostname and deployment evidence.
-- [ ] Commit and push deployment artifacts.
-- [ ] Verify the production GitHub Actions deployment.
+- [x] Commit and push deployment artifacts.
+- [x] Verify the production GitHub Actions deployment.
 - [x] Keep GitHub Pages enabled as rollback.
 
 ## Preparation evidence
@@ -209,12 +209,19 @@ will show the base package version.
 - Static Web App: `swa-fretboard-lab-prod-qrnmh2ac5v22y` (Free, West US 2)
 - Endpoint: `https://orange-grass-0f2e6e11e.7.azurestaticapps.net/`
 - Bootstrap deployment: `v1.0.0+bootstrap`
+- First versioned production deployment: `v1.0.0+ab5a705`
+- Source commit: `ab5a705a11efa72252f05d53cd1bac8b06bf5acf`
+- CI/CD run: `https://github.com/Naytron/guitar-fretboard/actions/runs/32520322225`
 - HTTP verification: `index.html`, `chords.html`, and `version.json` returned HTTP 200; both pages
   contained the matching version and self-test marker.
+- Browser verification: G Major rendered as `G A B C D E F♯`; the chord page rendered all 9 cards
+  in 3 groups; both accuracy badges passed with no horizontal overflow.
 - Security verification: Content Security Policy and `X-Frame-Options: DENY` were present.
 - GitHub secret configured: `AZURE_STATIC_WEB_APPS_API_TOKEN` at `2026-08-21T19:46:14Z` (UTC);
   its value was piped directly from Azure and was not printed or written to disk.
 - GitHub Pages rollback: `https://naytron.github.io/guitar-fretboard/` returned HTTP 200.
+- GitHub Pages deployment run `32520319994` also completed successfully after the production
+  changes were pushed.
 
 ### Live Role Verification
 
