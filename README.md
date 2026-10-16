@@ -4,13 +4,16 @@ An interactive guitar fretboard that shows the **accurate note names** for any r
 mode, or basic chord — right across the neck. It defaults to the **G major scale**
 (G A B C D E F♯), reproducing a printed "G Major Scale — Fretboard" diagram as a live web page.
 
-There are **two diagrams**:
+There are **three diagrams**:
 - **Scales** (`index.html`) — any root + scale/mode/chord across the neck.
 - **Chords** (`chords.html`) — pick a root and see the major, minor, dominant, diminished,
   suspended, added, and augmented chords as full-neck maps, every tone **colored by interval**.
+- **Progressions** (`progression.html`) — choose a root and major or natural minor scale to see
+  its seven diatonic triads in Roman numeral notation, with chord tones and full-neck maps.
 
 **▶ Azure production:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/ &nbsp;·&nbsp;
-**Chords:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/chords.html
+**Chords:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/chords.html &nbsp;·&nbsp;
+**Progressions:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/progression.html
 
 **GitHub Pages rollback:** https://naytron.github.io/guitar-fretboard/
 
@@ -52,9 +55,11 @@ version.
 
 - `.github/workflows/ci.yml` tests every pull request and `main` push, creates a deployment label
   such as `v1.0.0+309bc9b`, and uploads the verified `dist/` artifact.
-- `.github/workflows/deploy.yml` is a reusable production workflow. A successful `main` CI run
+- `.github/workflows/deploy.yml` is a reusable deployment workflow. A successful `main` CI run
   passes it the exact tested artifact, labels the deployment with the same version, deploys to
-  Azure Static Web Apps, and smoke-tests both pages plus `version.json`.
+  Azure Static Web Apps, and smoke-tests all three pages plus `version.json`.
+- Same-repository pull requests deploy the tested artifact to an Azure preview environment.
+  The Actions run's **preview** deployment links to that test site; production is unchanged.
 - `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
 - `.azure/deployment-plan.md` records the Azure context, validation evidence, and rollback plan.
 
@@ -77,16 +82,24 @@ Each tone is labelled with its true interval (an add9's ninth reads `9`, a dimin
 `♭♭7`), and a chord **self-test** checks the spellings on load (e.g. C = C E G, G7 = G B D F,
 C aug = C E G♯, C dim7 = C E♭ G♭ A).
 
+## The progression diagram
+Open **Progressions** (or `progression.html`) to see the seven triads built from each major or
+natural minor scale. The chords use uppercase Roman numerals for major, lowercase for minor, and
+`°` for diminished; each card includes chord notes and an interval-colored map across the neck.
+The progression self-test verifies the C major and A natural minor numeral patterns.
+
 ## Files
 | File | Purpose |
 | --- | --- |
 | `index.html` | Scales page + controls |
 | `chords.html` | Chords page (interval-colored, full-neck) |
-| `styles.css` | Fretboard + UI styling (both pages) |
+| `progression.html` | Diatonic progression page + controls |
+| `styles.css` | Fretboard + UI styling (all pages) |
 | `theme.js` | Applies the light/dark theme before rendering |
-| `fretboard.engine.js` | Pure note engine (tuning, chromatic math, key-aware spelling, scale **and chord** formulas) + self-tests |
+| `fretboard.engine.js` | Pure note engine (tuning, chromatic math, key-aware spelling, scale, chord, and progression formulas) + self-tests |
 | `fretboard.js` | Renders the scales neck |
 | `chords.js` | Renders the chords gallery |
+| `progression.js` | Renders the diatonic progression gallery |
 | `staticwebapp.config.json` | Azure Static Web Apps security headers |
 | `scripts/` | Accuracy tests, deterministic packaging, and deployment-boundary verification |
 | `.github/workflows/` | Continuous integration and version-labeled production deployment |

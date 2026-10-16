@@ -106,6 +106,56 @@ function noteAt(stringPc, fret) {
   return (stringPc + fret) % 12;
 }
 
+/* Build the diatonic triads for a major or natural-minor scale. */
+function diatonicTriads(rootPc, scaleKey) {
+  const scale = SCALES[scaleKey];
+  if (!Number.isInteger(rootPc) || rootPc < 0 || rootPc > 11) {
+    throw new RangeError('rootPc must be an integer from 0 through 11.');
+  }
+  if (!['major', 'natural_minor'].includes(scaleKey) || !scale) {
+    throw new RangeError('Diatonic triads are supported for major and natural minor scales.');
+  }
+
+  const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+  const qualities = {
+    '4,7': { name: 'Major', symbol: '', romanCase: 'upper', labels: ['R', '3', '5'] },
+    '3,7': { name: 'Minor', symbol: 'm', romanCase: 'lower', labels: ['R', '♭3', '5'] },
+    '3,6': { name: 'Diminished', symbol: 'dim', romanCase: 'lower', labels: ['R', '♭3', '♭5'] },
+  };
+  const steps = scale.steps;
+
+  return steps.map((rootStep, degreeIndex) => {
+    const thirdIndex = (degreeIndex + 2) % steps.length;
+    const fifthIndex = (degreeIndex + 4) % steps.length;
+    const thirdStep = steps[thirdIndex] + (thirdIndex <= degreeIndex ? 12 : 0);
+    const fifthStep = steps[fifthIndex] + (fifthIndex <= degreeIndex ? 12 : 0);
+    const intervals = [0, thirdStep - rootStep, fifthStep - rootStep];
+    const quality = qualities[`${intervals[1]},${intervals[2]}`];
+
+    if (!quality) {
+      throw new Error(`Unsupported diatonic triad intervals: ${intervals.join(',')}.`);
+    }
+
+    const roman = romanNumerals[degreeIndex];
+    const romanNumeral = quality.romanCase === 'lower' ? roman.toLowerCase() : roman;
+    const root = (rootPc + rootStep) % 12;
+
+    return {
+      degree: degreeIndex + 1,
+      rootPc: root,
+      quality: quality.name,
+      qualitySymbol: quality.symbol,
+      name: `${nameFor(root, keyPrefersFlats(rootPc, scale.family))} ${quality.name}`,
+      symbol: `${nameFor(root, keyPrefersFlats(rootPc, scale.family))}${quality.symbol}`,
+      romanNumeral: `${romanNumeral}${quality.name === 'Diminished' ? '°' : ''}`,
+      notes: intervals.map((interval) => (rootPc + rootStep + interval) % 12),
+      steps: intervals,
+      labels: quality.labels,
+      family: scale.family,
+    };
+  });
+}
+
 /* ---- Self-test: prove the note math is correct ---- */
 function runSelfTest() {
   const results = [];
@@ -175,11 +225,33 @@ function runChordSelfTest() {
   return { passed, results };
 }
 
+/* ---- Diatonic progression self-test ---- */
+function runDiatonicSelfTest() {
+  const results = [];
+  const check = (label, got, want) => results.push({ label, ok: got === want, got, want });
+  const summarize = (triads) => triads.map((chord) => chord.romanNumeral).join(' ');
+
+  check('C major Roman numerals', summarize(diatonicTriads(0, 'major')), 'I ii iii IV V vi vii°');
+  check('A natural minor Roman numerals', summarize(diatonicTriads(9, 'natural_minor')), 'i ii° III iv v VI VII');
+  check(
+    'C major chord notes',
+    diatonicTriads(0, 'major').map((chord) => chord.notes.map((pc) => nameFor(pc, false)).join(' ')).join(' | '),
+    'C E G | D F A | E G B | F A C | G B D | A C E | B D F',
+  );
+
+  const passed = results.every((r) => r.ok);
+  results.forEach((r) => {
+    if (!r.ok) console.error(`Diatonic progression self-test FAILED: ${r.label} → got "${r.got}", want "${r.want}"`);
+  });
+  return { passed, results };
+}
+
 /* Expose for Node-based testing while staying browser-friendly */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SHARP, FLAT, STRINGS, SCALES, CHORDS,
     keyPrefersFlats, nameFor, scaleSet, noteAt,
-    intervalCategory, chordIntervals, runSelfTest, runChordSelfTest,
+    intervalCategory, chordIntervals, diatonicTriads,
+    runSelfTest, runChordSelfTest, runDiatonicSelfTest,
   };
 }

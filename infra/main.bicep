@@ -35,7 +35,7 @@ module staticWebApp 'br/public:avm/res/web/static-site:0.9.3' = {
     location: location
     publicNetworkAccess: 'Enabled'
     sku: 'Free'
-    stagingEnvironmentPolicy: 'Disabled'
+    stagingEnvironmentPolicy: 'Enabled'
     tags: union(commonTags, {
       'azd-service-name': 'web'
     })

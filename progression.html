@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="theme.js"></script>
+  <title>Fretboard Lab — diatonic chord progressions</title>
+  <meta name="description" content="Explore the seven diatonic triads in any major or natural minor key, with Roman numerals, chord notes, and full-neck guitar maps." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to progression controls</a>
+
+  <header class="site-header">
+    <div class="topbar">
+      <a class="brand" href="index.html" aria-label="Fretboard Lab home">
+        <span class="brand-pick" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="brand-copy">
+          <strong>Fretboard Lab</strong>
+          <small>Guitar theory, made visible</small>
+        </span>
+      </a>
+
+      <nav class="site-nav" aria-label="Diagram type">
+        <a href="index.html">
+          <span class="nav-number">01</span> Scales
+        </a>
+        <a href="chords.html">
+          <span class="nav-number">02</span> Chords
+        </a>
+        <a href="progression.html" class="active" aria-current="page">
+          <span class="nav-number">03</span> Progressions
+        </a>
+      </nav>
+
+      <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Standard</span>
+        <strong>E A D G B E</strong>
+      </div>
+    </div>
+
+    <div class="hero hero-chords">
+      <div class="hero-copy">
+        <h1>One scale.<br /><em>Seven chords.</em></h1>
+        <p class="tagline">
+          Build the diatonic triads in a major or natural minor key. Read the progression in
+          Roman numerals, then find every chord tone across the neck.
+        </p>
+      </div>
+
+      <div class="hero-instrument" aria-hidden="true">
+        <div class="pick-display">
+          <span class="pick-shape pick-chord"><span class="pick-hole"></span></span>
+          <p><strong>Stack the scale.</strong><br />See harmony take shape.</p>
+        </div>
+        <div class="neck-sculpture chord-sculpture">
+          <span class="mini-fret fret-1"></span>
+          <span class="mini-fret fret-2"></span>
+          <span class="mini-fret fret-3"></span>
+          <span class="mini-fret fret-4"></span>
+          <span class="mini-string string-1"></span>
+          <span class="mini-string string-2"></span>
+          <span class="mini-string string-3"></span>
+          <span class="mini-string string-4"></span>
+          <span class="mini-string string-5"></span>
+          <span class="mini-string string-6"></span>
+          <span class="mini-note note-a"></span>
+          <span class="mini-note note-b"></span>
+          <span class="mini-note note-c"></span>
+          <span class="mini-note note-d"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <section class="control-deck" aria-labelledby="setup-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="setup-heading">Choose your key</h2>
+          <p>Every scale degree becomes a triad. The Roman numerals show its harmonic quality.</p>
+        </div>
+      </div>
+
+      <div class="controls chord-controls" aria-label="Progression controls">
+        <div class="control control-primary">
+          <label for="root">
+            <span class="control-label">Root note</span>
+            <span class="control-help">Your tonal center</span>
+          </label>
+          <select id="root"></select>
+        </div>
+        <div class="control control-primary">
+          <label for="scale">
+            <span class="control-label">Scale</span>
+            <span class="control-help">Major or natural minor</span>
+          </label>
+          <select id="scale">
+            <option value="major">Major</option>
+            <option value="natural_minor">Natural minor</option>
+          </select>
+        </div>
+        <div class="control control-range">
+          <label for="frets">
+            <span class="control-label">Fret range</span>
+            <span class="control-value"><span id="frets-out">12</span> frets</span>
+          </label>
+          <input type="range" id="frets" min="12" max="15" step="1" value="12" />
+          <div class="range-ends" aria-hidden="true"><span>12</span><span>15</span></div>
+        </div>
+        <div class="control">
+          <label for="spelling">
+            <span class="control-label">Note spelling</span>
+            <span class="control-help">Sharps or flats</span>
+          </label>
+          <select id="spelling">
+            <option value="auto" selected>Auto (by key)</option>
+            <option value="sharps">Sharps ♯</option>
+            <option value="flats">Flats ♭</option>
+          </select>
+        </div>
+        <div class="control control-primary">
+          <label for="label-mode">
+            <span class="control-label">Dot labels</span>
+            <span class="control-help">Notes, intervals, or both</span>
+          </label>
+          <select id="label-mode">
+            <option value="notes" selected>Note names</option>
+            <option value="intervals">Intervals</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="instrument-stage chord-stage" aria-labelledby="progression-title">
+      <header class="stage-header">
+        <div>
+          <h2 id="progression-title">G Major progression</h2>
+          <p id="progression-notes" class="stage-description"></p>
+        </div>
+        <div class="legend interval-legend" aria-label="Interval color legend">
+          <span class="key"><span class="swatch cat-root"></span> Root</span>
+          <span class="key"><span class="swatch cat-third"></span> 3rd</span>
+          <span class="key"><span class="swatch cat-fifth"></span> 5th</span>
+        </div>
+      </header>
+
+      <section id="progression" class="gallery progression-gallery" aria-label="Diatonic chord progression"></section>
+
+      <footer class="stage-footer">
+        <p id="selftest" class="selftest" role="status"></p>
+        <p class="math-note"><span aria-hidden="true">⌁</span> Each triad is stacked from alternate notes in the selected scale.</p>
+      </footer>
+    </section>
+
+    <section class="practice-panel" aria-labelledby="practice-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="practice-heading">Read the progression</h2>
+          <p>Roman numerals make the chord pattern portable to any key.</p>
+        </div>
+      </div>
+      <ul class="practice-steps concept-list">
+        <li>
+          <span class="step-number">I</span>
+          <div>
+            <h3>Uppercase is major</h3>
+            <p>Uppercase numerals identify major triads; lowercase numerals identify minor triads.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-number">°</span>
+          <div>
+            <h3>See diminished</h3>
+            <p>The small circle marks the diminished triad built on the leading tone in major or second degree in natural minor.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-number">1·3·5</span>
+          <div>
+            <h3>Stack every other note</h3>
+            <p>Each triad uses a scale degree, its third, and its fifth—shown here as a full-neck map.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
+    <p class="footer-meta">
+      <span>Original note engine · Standard tuning · Built for focused practice</span>
+      <span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span>
+    </p>
+  </footer>
+
+  <script src="fretboard.engine.js"></script>
+  <script src="progression.js"></script>
+</body>
+</html>

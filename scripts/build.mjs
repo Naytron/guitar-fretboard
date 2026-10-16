@@ -17,11 +17,13 @@ if (!versionPattern.test(version)) {
 const publicFiles = [
   'index.html',
   'chords.html',
+  'progression.html',
   'styles.css',
   'theme.js',
   'fretboard.engine.js',
   'fretboard.js',
   'chords.js',
+  'progression.js',
   'staticwebapp.config.json',
 ];
 const versionMarker = /(<span class="site-version" data-app-version>)[^<]+(<\/span>)/;
