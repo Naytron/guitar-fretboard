@@ -51,6 +51,7 @@ jobs:
           fi
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/index.html
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/chords.html
+          grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/progression.html
 
       - name: Deploy ${{ inputs.version }} to Azure
         id: azure_deploy
@@ -95,6 +96,8 @@ jobs:
           curl --fail --silent --show-error --location "${site_url}/index.html" |
             grep --fixed-strings --quiet 'id="selftest"'
           curl --fail --silent --show-error --location "${site_url}/chords.html" |
+            grep --fixed-strings --quiet 'id="selftest"'
+          curl --fail --silent --show-error --location "${site_url}/progression.html" |
             grep --fixed-strings --quiet 'id="selftest"'
 
       - name: Summarize deployment

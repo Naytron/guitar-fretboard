@@ -10,6 +10,8 @@ const expectedFiles = [
   'fretboard.engine.js',
   'fretboard.js',
   'index.html',
+  'progression.html',
+  'progression.js',
   'staticwebapp.config.json',
   'styles.css',
   'theme.js',
@@ -36,7 +38,7 @@ if (metadata.source !== 'Naytron/guitar-fretboard') {
   throw new Error(`Unexpected version.json source: ${metadata.source}`);
 }
 
-for (const file of ['index.html', 'chords.html']) {
+for (const file of ['index.html', 'chords.html', 'progression.html']) {
   const html = await readFile(resolve(dist, file), 'utf8');
   const label = `<span class="site-version" data-app-version>${metadata.version}</span>`;
   if (!html.includes(label)) {

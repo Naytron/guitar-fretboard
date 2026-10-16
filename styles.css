@@ -1074,6 +1074,25 @@ code {
   font-weight: 500;
 }
 
+.progression-gallery {
+  margin-top: 0.75rem;
+}
+
+.progression-numeral {
+  display: inline-flex;
+  min-width: 2.3rem;
+  justify-content: center;
+  margin-right: 0.2rem;
+  padding: 0.12rem 0.35rem;
+  border: 1px solid var(--cp-border);
+  border-radius: 0.35rem;
+  background: var(--cp-surface);
+  color: var(--cp-accent);
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .chord-sub {
   display: flex;
   flex-wrap: wrap;
