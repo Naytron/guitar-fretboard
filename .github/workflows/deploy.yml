@@ -11,6 +11,10 @@ on:
         description: Immutable deployment version label
         required: true
         type: string
+      environment:
+        description: GitHub deployment environment
+        default: production
+        type: string
     secrets:
       AZURE_STATIC_WEB_APPS_API_TOKEN:
         description: Azure Static Web Apps deployment token
@@ -21,7 +25,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: azure-static-web-apps-production
+  group: azure-static-web-apps-${{ inputs.environment }}-${{ inputs.environment == 'production' && 'main' || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -30,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
-      name: production
+      name: ${{ inputs.environment }}
       url: ${{ steps.azure_deploy.outputs.static_web_app_url }}
     steps:
       - name: Download tested artifact
@@ -59,6 +63,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
+          production_branch: main
           app_location: dist
           api_location: ""
           output_location: ""

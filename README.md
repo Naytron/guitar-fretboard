@@ -58,6 +58,8 @@ version.
 - `.github/workflows/deploy.yml` is a reusable production workflow. A successful `main` CI run
   passes it the exact tested artifact, labels the deployment with the same version, deploys to
   Azure Static Web Apps, and smoke-tests both pages plus `version.json`.
+- Same-repository pull requests deploy the tested artifact to an Azure preview environment.
+  The Actions run's **preview** deployment links to that test site; production is unchanged.
 - `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
 - `.azure/deployment-plan.md` records the Azure context, validation evidence, and rollback plan.
 

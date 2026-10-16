@@ -89,6 +89,20 @@ jobs:
             echo "- Commit: \`${GITHUB_SHA}\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
+  preview:
+    name: Preview ${{ needs.build.outputs.version }}
+    needs: build
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/deploy.yml
+    with:
+      artifact_name: ${{ needs.build.outputs.artifact_name }}
+      version: ${{ needs.build.outputs.version }}
+      environment: preview
+    secrets:
+      AZURE_STATIC_WEB_APPS_API_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+
   deploy:
     name: Deploy ${{ needs.build.outputs.version }}
     needs: build
