@@ -55,9 +55,9 @@ version.
 
 - `.github/workflows/ci.yml` tests every pull request and `main` push, creates a deployment label
   such as `v1.0.0+309bc9b`, and uploads the verified `dist/` artifact.
-- `.github/workflows/deploy.yml` is a reusable production workflow. A successful `main` CI run
+- `.github/workflows/deploy.yml` is a reusable deployment workflow. A successful `main` CI run
   passes it the exact tested artifact, labels the deployment with the same version, deploys to
-  Azure Static Web Apps, and smoke-tests both pages plus `version.json`.
+  Azure Static Web Apps, and smoke-tests all three pages plus `version.json`.
 - Same-repository pull requests deploy the tested artifact to an Azure preview environment.
   The Actions run's **preview** deployment links to that test site; production is unchanged.
 - `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
