@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="theme.js"></script>
+  <title>Fretboard Lab — map scale chord progressions</title>
+  <meta name="description" content="Choose a key and scale to explore diatonic chords, Roman numerals, and common guitar chord progressions." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to progression controls</a>
+
+  <header class="site-header">
+    <div class="topbar">
+      <a class="brand" href="index.html" aria-label="Fretboard Lab home">
+        <span class="brand-pick" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-copy"><strong>Fretboard Lab</strong><small>Guitar theory, made visible</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Diagram type">
+        <a href="index.html"><span class="nav-number">01</span> Scales</a>
+        <a href="chords.html"><span class="nav-number">02</span> Chords</a>
+        <a href="progressions.html" class="active" aria-current="page"><span class="nav-number">03</span> Progressions</a>
+      </nav>
+      <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
+        <span class="status-dot" aria-hidden="true"></span><span>Standard</span><strong>E A D G B E</strong>
+      </div>
+    </div>
+
+    <div class="hero hero-chords">
+      <div class="hero-copy">
+        <h1>Find the chords.<br /><em>Build the movement.</em></h1>
+        <p class="tagline">
+          Choose a key and scale to reveal its diatonic chords, Roman numerals, and familiar
+          progressions—with every chord tone spelled for its musical role.
+        </p>
+      </div>
+      <div class="hero-instrument" aria-hidden="true">
+        <div class="pick-display">
+          <span class="pick-shape pick-chord"><span class="pick-hole"></span></span>
+          <p><strong>One scale.</strong><br />Many ways forward.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <section class="control-deck" aria-labelledby="setup-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="setup-heading">Set your key and scale</h2>
+          <p>Chord qualities and Roman numerals are calculated from the selected scale.</p>
+        </div>
+      </div>
+      <div class="controls progression-controls" aria-label="Progression controls">
+        <div class="control control-primary">
+          <label for="root"><span class="control-label">Key</span><span class="control-help">Tonal center</span></label>
+          <select id="root"></select>
+        </div>
+        <div class="control control-primary">
+          <label for="scale"><span class="control-label">Scale or mode</span><span class="control-help">Seven-note scales</span></label>
+          <select id="scale"></select>
+        </div>
+        <div class="control">
+          <label for="spelling"><span class="control-label">Note spelling</span><span class="control-help">Sharps or flats</span></label>
+          <select id="spelling">
+            <option value="auto" selected>Auto (by key)</option>
+            <option value="sharps">Sharps ♯</option>
+            <option value="flats">Flats ♭</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="chord-type"><span class="control-label">Chord tones</span><span class="control-help">Triads or seventh chords</span></label>
+          <select id="chord-type">
+            <option value="triads" selected>Triads</option>
+            <option value="sevenths">Seventh chords</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="progression"><span class="control-label">Progression pattern</span><span class="control-help">Choose a common sequence</span></label>
+          <select id="progression">
+            <option value="1,4,5,1">Tonal turnaround</option>
+            <option value="1,5,6,4" selected>Four-chord cycle</option>
+            <option value="2,5,1">Two-five-one cadence</option>
+            <option value="6,4,1,5">Relative-minor cycle</option>
+            <option value="1,6,2,5">Circle-of-fifths cycle</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="instrument-stage progression-stage" aria-labelledby="diatonic-heading">
+      <header class="stage-header">
+        <div>
+          <h2 id="diatonic-heading">Chords in <span id="key-summary">G Major (Ionian)</span></h2>
+          <p class="stage-description">Each scale degree becomes a chord by stacking every other scale tone.</p>
+        </div>
+      </header>
+      <div id="diatonic-chords" class="diatonic-chords" aria-live="polite"></div>
+    </section>
+
+    <section class="instrument-stage progression-stage" aria-labelledby="progression-heading">
+      <header class="stage-header">
+        <div>
+          <h2 id="progression-heading">Progression map</h2>
+          <p id="progression-caption" class="stage-description" aria-live="polite"></p>
+        </div>
+      </header>
+      <ol id="progression-map" class="progression-map" aria-label="Selected chord progression"></ol>
+      <footer class="stage-footer">
+        <p id="selftest" class="selftest" role="status"></p>
+        <p class="math-note"><span aria-hidden="true">⌁</span> Roman numerals and chord tones follow the selected scale.</p>
+      </footer>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
+    <p class="footer-meta">
+      <span>Original note engine · Standard tuning · Built for focused practice</span>
+      <span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span>
+    </p>
+  </footer>
+
+  <script src="fretboard.engine.js"></script>
+  <script src="progressions.js"></script>
+</body>
+</html>

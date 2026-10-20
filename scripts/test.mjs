@@ -30,9 +30,12 @@ const JavaScriptFiles = [
   'fretboard.engine.js',
   'fretboard.js',
   'chords.js',
+  'progressions.js',
   'scripts/build.mjs',
   'scripts/test.mjs',
   'scripts/verify-dist.mjs',
+  'playwright.config.mjs',
+  'tests/fretboard.spec.mjs',
 ];
 
 for (const file of JavaScriptFiles) {
@@ -47,7 +50,7 @@ for (const file of JavaScriptFiles) {
   }
 }
 
-for (const file of ['index.html', 'chords.html']) {
+for (const file of ['index.html', 'chords.html', 'progressions.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
   const hasVersion = html.includes('class="site-version" data-app-version');
   const hasInlineScript = /<script(?![^>]*\bsrc=)[^>]*>/i.test(html);

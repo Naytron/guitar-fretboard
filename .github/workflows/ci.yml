@@ -66,6 +66,12 @@ jobs:
       - name: Build versioned static artifact
         run: npm run build
 
+      - name: Install Chromium for browser tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end and responsive checks
+        run: npm run test:e2e
+
       - name: Verify deployment boundary
         run: npm run verify:dist
 

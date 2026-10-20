@@ -18,6 +18,8 @@ desktop.ini
 # Generated build and dependency state
 /dist/
 /node_modules/
+/playwright-report/
+/test-results/
 
 # Local Azure Developer CLI environments (keep the shared deployment plan)
 /.azure/*
