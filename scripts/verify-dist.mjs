@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 const expectedFiles = [
+  'chord-fretboard.js',
   'chords.html',
   'chords.js',
   'fretboard.engine.js',

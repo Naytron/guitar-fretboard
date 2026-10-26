@@ -30,6 +30,7 @@ const JavaScriptFiles = [
   'fretboard.engine.js',
   'fretboard.js',
   'chords.js',
+  'chord-fretboard.js',
   'progressions.js',
   'scripts/build.mjs',
   'scripts/test.mjs',

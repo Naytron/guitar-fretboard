@@ -33,20 +33,11 @@
     return keyPrefersFlats(rootPc, family); // auto
   }
 
-  function cell(cls, text) {
-    const c = document.createElement('div');
-    c.className = cls;
-    if (text) c.textContent = text;
-    return c;
-  }
-
   /* ---- Render one chord as a compact full-neck map ---- */
   function renderChord(rootPc, chordKey, fretCount, labelMode) {
     const chord = CHORDS[chordKey];
     const flats = useFlatsFor(rootPc, chord.family);
-    const intervals = chordIntervals(rootPc, chord); // pitch class → interval label
     const notes = spellChord(rootPc, chord, flats);
-    const noteNames = new Map(chord.steps.map((step, i) => [(rootPc + step) % 12, notes[i]]));
     const rootName = nameFor(rootPc, flats);
 
     const card = document.createElement('article');
@@ -61,53 +52,7 @@
       `<span class="chord-formula">${chord.labels.join(' ')}</span></p>`;
     card.appendChild(head);
 
-    const grid = document.createElement('div');
-    grid.className = 'fb-grid chord-grid';
-    grid.style.gridTemplateColumns = `var(--label-col) repeat(${fretCount + 1}, 1fr)`;
-
-    // header row: fret numbers + inlays
-    grid.appendChild(cell('fb-corner', ''));
-    for (let f = 0; f <= fretCount; f++) {
-      const c = cell('fb-fretnum', String(f));
-      if (f === 0) c.classList.add('open-col');
-      if (f === 1) c.classList.add('nut');
-      if (DOUBLE_MARKERS.has(f)) c.classList.add('marker', 'marker-2');
-      else if (SINGLE_MARKERS.has(f)) c.classList.add('marker');
-      grid.appendChild(c);
-    }
-
-    // string rows: high e (1st) on top → low E (6th) on bottom
-    for (let i = STRINGS.length - 1; i >= 0; i--) {
-      const str = STRINGS[i];
-      grid.appendChild(cell('fb-string-label', str.label));
-      for (let f = 0; f <= fretCount; f++) {
-        const c = document.createElement('div');
-        c.className = 'fb-cell';
-        if (f === 0) c.classList.add('open-col');
-        if (f === 1) c.classList.add('nut');
-        const pc = noteAt(str.pc, f);
-        if (intervals.has(pc)) {
-          const label = intervals.get(pc);
-          const name = noteNames.get(pc);
-          const dot = document.createElement('span');
-          dot.className = `note cat-${intervalCategory(label)}`;
-          if (label === 'R') dot.classList.add('is-root');
-          if (labelMode === 'intervals') {
-            dot.textContent = label;
-          } else if (labelMode === 'both') {
-            dot.classList.add('dot-both');
-            dot.innerHTML = `${name}<small>${label}</small>`;
-          } else {
-            dot.textContent = name;
-          }
-          dot.title = `${name} — ${label}`;
-          c.appendChild(dot);
-        }
-        grid.appendChild(c);
-      }
-    }
-
-    card.appendChild(grid);
+    card.appendChild(renderChordFretboard(rootPc, chord, notes, fretCount, labelMode));
     return card;
   }
 

@@ -94,6 +94,10 @@ Open **Progressions** (`progressions.html`), select a key and a seven-note scale
 choose triads or seventh chords and a common progression pattern. The view lays out all seven
 diatonic chords with their Roman numerals and correctly spelled chord tones, then maps the selected
 sequence in order. Progression tones are computed from the same scale and interval engine.
+Each chord in the selected progression includes an interval-colored fretboard showing its tones
+on all six strings in standard tuning. Choose 12–24 frets and note, interval, or combined dot labels.
+These are full-neck tone maps rather than prescribed chord fingerings; on narrow screens the necks
+scroll horizontally and can be focused with the keyboard.
 
 ## Files
 | File | Purpose |
@@ -106,6 +110,7 @@ sequence in order. Progression tones are computed from the same scale and interv
 | `fretboard.engine.js` | Pure note engine (tuning, chromatic math, key-aware spelling, scale **and chord** formulas) + self-tests |
 | `fretboard.js` | Renders the scales neck |
 | `chords.js` | Renders the chords gallery |
+| `chord-fretboard.js` | Shared interval-colored neck renderer for chords and progressions |
 | `progressions.js` | Generates diatonic chords and progression maps |
 | `staticwebapp.config.json` | Azure Static Web Apps security headers |
 | `scripts/` | Accuracy tests, deterministic packaging, and deployment-boundary verification |
