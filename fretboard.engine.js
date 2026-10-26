@@ -96,6 +96,91 @@ function nameFor(pc, useFlats) {
   return (useFlats ? FLAT : SHARP)[((pc % 12) + 12) % 12];
 }
 
+const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+const NATURAL_PITCHES = [0, 2, 4, 5, 7, 9, 11];
+
+function intervalDegree(label) {
+  if (label === 'R') return 0;
+  const interval = Number(label.match(/\d+/)?.[0]);
+  const degrees = { 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 9: 1, 11: 3, 13: 5 };
+  if (!degrees[interval]) throw new Error(`Unsupported chord interval: ${label}`);
+  return degrees[interval];
+}
+
+function spellChord(rootPc, chord, useFlats) {
+  const rootName = nameFor(rootPc, useFlats);
+  const rootLetter = LETTERS.indexOf(rootName[0]);
+  return chord.steps.map((step, index) => {
+    const degree = intervalDegree(chord.labels[index]);
+    if (degree === 0) return rootName;
+
+    const letterIndex = (rootLetter + degree) % LETTERS.length;
+    const naturalPitch = NATURAL_PITCHES[letterIndex];
+    const targetPitch = (rootPc + step) % 12;
+    const difference = ((targetPitch - naturalPitch + 12) % 12);
+    const accidentalOffset = difference > 6 ? difference - 12 : difference;
+    if (Math.abs(accidentalOffset) > 2) {
+      throw new Error(`Cannot spell ${chord.labels[index]} from ${rootName}`);
+    }
+    const accidental = accidentalOffset < 0
+      ? '♭'.repeat(-accidentalOffset)
+      : '♯'.repeat(accidentalOffset);
+    return `${LETTERS[letterIndex]}${accidental}`;
+  });
+}
+
+function diatonicChords(rootPc, scale, useSevenths = false, useFlats = keyPrefersFlats(rootPc, scale.family)) {
+  if (scale.steps.length !== 7) {
+    throw new Error(`Diatonic progressions require a seven-note scale: ${scale.name}`);
+  }
+
+  const romanDegrees = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+  const scaleStepAt = (degree) => scale.steps[degree % 7] + Math.floor(degree / 7) * 12;
+
+  return romanDegrees.map((roman, degree) => {
+    const rootStep = scaleStepAt(degree);
+    const third = scaleStepAt(degree + 2) - rootStep;
+    const fifth = scaleStepAt(degree + 4) - rootStep;
+    const seventh = scaleStepAt(degree + 6) - rootStep;
+    const steps = [0, third, fifth];
+    const labels = ['R', third === 3 ? '♭3' : '3', fifth === 6 ? '♭5' : fifth === 8 ? '♯5' : '5'];
+    const diminished = fifth === 6;
+    const augmented = fifth === 8;
+    const minor = third === 3;
+    let numeral = minor || diminished ? roman.toLowerCase() : roman;
+    if (diminished) numeral += '°';
+    else if (augmented) numeral += '+';
+
+    let name = diminished ? 'Diminished' : augmented ? 'Augmented' : minor ? 'Minor' : 'Major';
+    if (useSevenths) {
+      steps.push(seventh);
+      labels.push(seventh === 9 ? '♭♭7' : seventh === 10 ? '♭7' : '7');
+      if (diminished) {
+        if (seventh === 10) numeral = `${roman.toLowerCase()}ø7`;
+        else numeral = `${roman.toLowerCase()}°7`;
+        name = seventh === 10 ? 'Half-diminished 7' : 'Diminished 7';
+      } else {
+        numeral += seventh === 11 ? 'maj7' : '7';
+        name = seventh === 11
+          ? `${name} 7`
+          : minor ? 'Minor 7' : augmented ? 'Augmented 7' : 'Dominant 7';
+      }
+    }
+
+    const root = (rootPc + rootStep) % 12;
+    const chord = { steps, labels };
+    return {
+      degree,
+      root,
+      roman: numeral,
+      name,
+      steps,
+      labels,
+      notes: spellChord(root, chord, useFlats),
+    };
+  });
+}
+
 /* The set of pitch classes belonging to root + scale formula */
 function scaleSet(rootPc, steps) {
   return new Set(steps.map((s) => (rootPc + s) % 12));
@@ -155,7 +240,7 @@ function runChordSelfTest() {
     [3, 'major',      'E♭ G B♭'],   // flat-root chord spells with flats
     [0, 'augmented',  'C E G♯'],
     [11, 'diminished','B D F'],
-    [0, 'dim7',       'C E♭ G♭ A'], // dim family → flats (relative-major E♭)
+    [0, 'dim7',       'C E♭ G♭ B♭♭'], // interval spelling preserves the diminished seventh degree
     [2, 'sus2',       'D E A'],
     [2, 'sus4',       'D G A'],
     [0, 'add9',       'C E G D'],
@@ -164,9 +249,22 @@ function runChordSelfTest() {
   cases.forEach(([rootPc, key, want]) => {
     const chord = CHORDS[key];
     const flats = keyPrefersFlats(rootPc, chord.family);
-    const got = chord.steps.map((s) => nameFor((rootPc + s) % 12, flats)).join(' ');
+    const got = spellChord(rootPc, chord, flats).join(' ');
     check(`${nameFor(rootPc, flats)} ${chord.name}`, got, want);
   });
+  check('C dominant 7 interval spelling', spellChord(0, CHORDS.dom7, false).join(' '), 'C E G B♭');
+  check('F diminished interval spelling', spellChord(5, CHORDS.diminished, true).join(' '), 'F A♭ C♭');
+  check('C diminished 7 interval spelling', spellChord(0, CHORDS.dim7, true).join(' '), 'C E♭ G♭ B♭♭');
+  check(
+    'G major diatonic triads',
+    diatonicChords(7, SCALES.major).map((chord) => chord.roman).join(' '),
+    'I ii iii IV V vi vii°',
+  );
+  check(
+    'C natural minor diatonic sevenths',
+    diatonicChords(0, SCALES.natural_minor, true).map((chord) => chord.roman).join(' '),
+    'i7 iiø7 IIImaj7 iv7 v7 VImaj7 VII7',
+  );
 
   const passed = results.every((r) => r.ok);
   results.forEach((r) => {
@@ -179,7 +277,7 @@ function runChordSelfTest() {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SHARP, FLAT, STRINGS, SCALES, CHORDS,
-    keyPrefersFlats, nameFor, scaleSet, noteAt,
+    keyPrefersFlats, nameFor, spellChord, diatonicChords, scaleSet, noteAt,
     intervalCategory, chordIntervals, runSelfTest, runChordSelfTest,
   };
 }

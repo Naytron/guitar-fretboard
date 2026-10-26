@@ -45,8 +45,9 @@
     const chord = CHORDS[chordKey];
     const flats = useFlatsFor(rootPc, chord.family);
     const intervals = chordIntervals(rootPc, chord); // pitch class → interval label
+    const notes = spellChord(rootPc, chord, flats);
+    const noteNames = new Map(chord.steps.map((step, i) => [(rootPc + step) % 12, notes[i]]));
     const rootName = nameFor(rootPc, flats);
-    const notes = chord.steps.map((s) => nameFor((rootPc + s) % 12, flats));
 
     const card = document.createElement('article');
     card.className = 'chord-card';
@@ -87,7 +88,7 @@
         const pc = noteAt(str.pc, f);
         if (intervals.has(pc)) {
           const label = intervals.get(pc);
-          const name = nameFor(pc, flats);
+          const name = noteNames.get(pc);
           const dot = document.createElement('span');
           dot.className = `note cat-${intervalCategory(label)}`;
           if (label === 'R') dot.classList.add('is-root');

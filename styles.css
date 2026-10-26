@@ -1119,6 +1119,90 @@ code {
   font-size: 0.62rem;
 }
 
+.progression-controls {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.progression-stage {
+  margin-top: 1rem;
+}
+
+.diatonic-chords {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.75rem;
+}
+
+.diatonic-card,
+.progression-card {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--cp-border);
+  border-radius: 0.625rem;
+  background: var(--cp-surface-soft);
+}
+
+.diatonic-numeral {
+  margin: 0;
+  color: var(--cp-accent);
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: 1.4rem;
+}
+
+.diatonic-name,
+.diatonic-notes {
+  margin: 0.4rem 0 0;
+}
+
+.diatonic-name {
+  color: var(--cp-text);
+  font-weight: 700;
+}
+
+.diatonic-notes {
+  color: var(--cp-text-muted);
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: 0.75rem;
+}
+
+.progression-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progression-card {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.progression-position {
+  color: var(--cp-text-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.progression-numeral {
+  color: var(--cp-accent);
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: 1.65rem;
+}
+
+.progression-name {
+  color: var(--cp-text);
+  font-weight: 700;
+}
+
+.progression-notes {
+  color: var(--cp-text-muted);
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: 0.75rem;
+}
+
 .note.cat-root {
   background: var(--cp-accent);
   color: var(--cp-accent-fg);
