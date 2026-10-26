@@ -86,6 +86,19 @@
             <option value="1,6,2,5">Circle-of-fifths cycle</option>
           </select>
         </div>
+        <div class="control control-range">
+          <label for="frets"><span class="control-label">Fret range</span><span class="control-value"><span id="frets-out">12</span> frets</span></label>
+          <input type="range" id="frets" min="12" max="24" step="1" value="12" />
+          <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
+        </div>
+        <div class="control">
+          <label for="label-mode"><span class="control-label">Dot labels</span><span class="control-help">Notes, intervals, or both</span></label>
+          <select id="label-mode">
+            <option value="notes" selected>Note names</option>
+            <option value="intervals">Intervals</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
       </div>
     </section>
 
@@ -104,6 +117,13 @@
         <div>
           <h2 id="progression-heading">Progression map</h2>
           <p id="progression-caption" class="stage-description" aria-live="polite"></p>
+          <p class="stage-description">Each neck shows all positions of that chord's tones, not a single fingering. Scroll horizontally to explore more frets.</p>
+        </div>
+        <div class="legend interval-legend" aria-label="Interval color legend">
+          <span class="key"><span class="swatch cat-root"></span> Root</span>
+          <span class="key"><span class="swatch cat-third"></span> 3rd</span>
+          <span class="key"><span class="swatch cat-fifth"></span> 5th</span>
+          <span class="key"><span class="swatch cat-seventh"></span> 7th</span>
         </div>
       </header>
       <ol id="progression-map" class="progression-map" aria-label="Selected chord progression"></ol>
@@ -123,6 +143,7 @@
   </footer>
 
   <script src="fretboard.engine.js"></script>
+  <script src="chord-fretboard.js"></script>
   <script src="progressions.js"></script>
 </body>
 </html>

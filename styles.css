@@ -1167,7 +1167,7 @@ code {
 
 .progression-map {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr));
   gap: 0.75rem;
   margin: 0;
   padding: 0;
@@ -1177,6 +1177,12 @@ code {
 .progression-card {
   display: grid;
   gap: 0.35rem;
+}
+
+.progression-fretboard {
+  min-width: 0;
+  overflow-x: auto;
+  margin-top: 0.5rem;
 }
 
 .progression-position {

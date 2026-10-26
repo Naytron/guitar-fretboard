@@ -23,6 +23,7 @@ const publicFiles = [
   'fretboard.engine.js',
   'fretboard.js',
   'chords.js',
+  'chord-fretboard.js',
   'progressions.js',
   'staticwebapp.config.json',
 ];

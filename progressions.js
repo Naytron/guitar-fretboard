@@ -11,6 +11,9 @@
     spelling: $('spelling'),
     chordType: $('chord-type'),
     progression: $('progression'),
+    frets: $('frets'),
+    fretsOut: $('frets-out'),
+    labelMode: $('label-mode'),
     keySummary: $('key-summary'),
     chords: $('diatonic-chords'),
     progressionMap: $('progression-map'),
@@ -32,6 +35,8 @@
     const scale = SCALES[els.scale.value];
     const flats = preferFlats(rootPc, scale);
     const chords = diatonicChords(rootPc, scale, els.chordType.value === 'sevenths', flats);
+    const fretCount = Number(els.frets.value);
+    els.fretsOut.textContent = String(fretCount);
     els.keySummary.textContent = `${nameFor(rootPc, flats)} ${scale.name}`;
 
     const chordCards = chords.map((chord) => {
@@ -69,6 +74,12 @@
       notes.className = 'progression-notes';
       notes.textContent = chord.notes.join(' · ');
       item.append(position, numeral, name, notes);
+      const neck = document.createElement('section');
+      neck.className = 'progression-fretboard';
+      neck.tabIndex = 0;
+      neck.setAttribute('aria-label', `Chord ${index + 1}: ${chord.roman}, ${chord.notes[0]} ${chord.name} fretboard`);
+      neck.appendChild(renderChordFretboard(chord.root, chord, chord.notes, fretCount, els.labelMode.value));
+      item.appendChild(neck);
       return item;
     });
     els.progressionMap.replaceChildren(...progressionCards);
@@ -93,9 +104,10 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
-    [els.root, els.scale, els.spelling, els.chordType, els.progression].forEach((control) => {
+    [els.root, els.scale, els.spelling, els.chordType, els.progression, els.frets, els.labelMode].forEach((control) => {
       control.addEventListener('change', render);
     });
+    els.frets.addEventListener('input', render);
     render();
     showSelfTest();
   });
