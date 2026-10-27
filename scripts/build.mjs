@@ -18,6 +18,7 @@ const publicFiles = [
   'index.html',
   'chords.html',
   'progressions.html',
+  'modes.html',
   'styles.css',
   'theme.js',
   'fretboard.engine.js',

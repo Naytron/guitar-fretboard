@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
 import { dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -6,7 +7,13 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
-const { CHORDS, runChordSelfTest, runSelfTest } = require(resolve(root, 'fretboard.engine.js'));
+const { CHORDS, MODES, SCALES, modeStepPattern, runChordSelfTest, runSelfTest } = require(resolve(root, 'fretboard.engine.js'));
+const patterns = ['WWHWWWH', 'WHWWWHW', 'HWWWHWW', 'WWWHWWH', 'WWHWWHW', 'WHWWHWW', 'HWWHWWW'];
+Object.keys(MODES).forEach((key, index) => {
+  const pattern = modeStepPattern(SCALES[key].steps);
+  assert.equal(pattern.join(''), patterns[index], `${key} modal pattern including octave return`);
+  assert.equal(pattern.reduce((total, step) => total + (step === 'W' ? 2 : 1), 0), 12);
+});
 const suites = [
   ['note engine', runSelfTest()],
   ['chord engine', runChordSelfTest()],
@@ -51,7 +58,7 @@ for (const file of JavaScriptFiles) {
   }
 }
 
-for (const file of ['index.html', 'chords.html', 'progressions.html']) {
+for (const file of ['index.html', 'chords.html', 'progressions.html', 'modes.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
   const hasVersion = html.includes('class="site-version" data-app-version');
   const hasInlineScript = /<script(?![^>]*\bsrc=)[^>]*>/i.test(html);

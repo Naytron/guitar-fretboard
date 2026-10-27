@@ -62,6 +62,24 @@ const CHORDS = {
   add9:       { name: 'Add9',         symbol: 'add9', steps: [0, 4, 7, 2],  labels: ['R', '3', '5', '9'],      family: 'major', group: 'Suspended & added' },
 };
 
+const MODES = {
+  major: { name: 'Ionian (major)', parentOffset: 0 },
+  dorian: { name: 'Dorian', parentOffset: 2 },
+  phrygian: { name: 'Phrygian', parentOffset: 4 },
+  lydian: { name: 'Lydian', parentOffset: 5 },
+  mixolydian: { name: 'Mixolydian', parentOffset: 7 },
+  natural_minor: { name: 'Aeolian (natural minor)', parentOffset: 9 },
+  locrian: { name: 'Locrian', parentOffset: 11 },
+};
+
+function modeStepPattern(steps) {
+  return steps.map((step, index) => {
+    const distance = (steps[index + 1] ?? 12) - step;
+    if (distance !== 1 && distance !== 2) throw new Error(`Invalid modal step: ${distance}`);
+    return distance === 2 ? 'W' : 'H';
+  });
+}
+
 /* Map an interval label to a color category used by the chords diagram. */
 function intervalCategory(label) {
   if (label === 'R') return 'root';
@@ -276,7 +294,7 @@ function runChordSelfTest() {
 /* Expose for Node-based testing while staying browser-friendly */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    SHARP, FLAT, STRINGS, SCALES, CHORDS,
+    SHARP, FLAT, STRINGS, SCALES, CHORDS, MODES, modeStepPattern,
     keyPrefersFlats, nameFor, spellChord, diatonicChords, scaleSet, noteAt,
     intervalCategory, chordIntervals, runSelfTest, runChordSelfTest,
   };
