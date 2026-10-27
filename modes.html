@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="theme.js"></script>
+  <title>Fretboard Lab — explore modes and step patterns</title>
+  <meta name="description" content="Explore all seven diatonic modes by key, with whole-step and half-step patterns and a guitar fretboard." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-view="modes">
+  <a class="skip-link" href="#workspace">Skip to mode controls</a>
+  <header class="site-header">
+    <div class="topbar">
+      <a class="brand" href="index.html" aria-label="Fretboard Lab home">
+        <span class="brand-pick" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-copy"><strong>Fretboard Lab</strong><small>Guitar theory, made visible</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Diagram type">
+        <a href="index.html"><span class="nav-number">01</span> Scales</a>
+        <a href="chords.html"><span class="nav-number">02</span> Chords</a>
+        <a href="progressions.html"><span class="nav-number">03</span> Progressions</a>
+        <a href="modes.html" class="active" aria-current="page"><span class="nav-number">04</span> Modes</a>
+      </nav>
+      <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
+        <span class="status-dot" aria-hidden="true"></span><span>Standard</span><strong>E A D G B E</strong>
+      </div>
+    </div>
+    <div class="hero">
+      <div class="hero-copy">
+        <h1>Change the steps.<br /><em>Find the mode.</em></h1>
+        <p class="tagline">Explore seven modal colors from any tonic. Follow the whole and half steps, then find those notes across the neck.</p>
+      </div>
+    </div>
+  </header>
+  <main id="workspace" class="workspace">
+    <section class="control-deck" aria-labelledby="setup-heading">
+      <div class="section-heading">
+        <div><h2 id="setup-heading">Choose your mode</h2><p>The key is the mode's tonic, not its parent major key.</p></div>
+      </div>
+      <div class="controls" aria-label="Mode controls">
+        <div class="control control-primary">
+          <label for="root"><span class="control-label">Key</span><span class="control-help">Modal tonic</span></label>
+          <select id="root"></select>
+        </div>
+        <div class="control control-primary">
+          <label for="scale"><span class="control-label">Mode</span><span class="control-help">Choose the modal pattern</span></label>
+          <select id="scale"></select>
+        </div>
+        <div class="control control-range">
+          <label for="frets"><span class="control-label">Fret range</span><span class="control-value"><span id="frets-out">15</span> frets</span></label>
+          <input type="range" id="frets" min="12" max="24" step="1" value="15" />
+          <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
+        </div>
+        <div class="control">
+          <label for="spelling"><span class="control-label">Note spelling</span><span class="control-help">Tonic spelling preference</span></label>
+          <select id="spelling">
+            <option value="auto" selected>Auto (by key)</option>
+            <option value="sharps">Sharps ♯</option>
+            <option value="flats">Flats ♭</option>
+          </select>
+        </div>
+        <div class="control control-check">
+          <input type="checkbox" id="show-all" />
+          <label for="show-all">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span class="toggle-copy"><strong>Show every note</strong><small>Dim notes outside the mode</small></span>
+          </label>
+        </div>
+      </div>
+    </section>
+    <section class="instrument-stage" aria-labelledby="scale-title">
+      <header class="stage-header">
+        <div class="readout" aria-live="polite">
+          <h2 id="scale-title" class="scale-title">G Ionian (major)</h2>
+          <p id="scale-notes" class="scale-notes"></p>
+        </div>
+        <div class="legend" aria-label="Fretboard legend">
+          <span class="key"><span class="swatch root"></span> Tonic</span>
+          <span class="key"><span class="swatch in-scale"></span> Mode tone</span>
+          <span class="key"><span class="swatch ghost"></span> Outside mode</span>
+        </div>
+      </header>
+      <section class="mode-pattern-panel" aria-labelledby="pattern-heading">
+        <h3 id="pattern-heading">Whole-step and half-step pattern</h3>
+        <p>W = whole step (2 frets). H = half step (1 fret). The final step returns to the tonic one octave higher.</p>
+        <div aria-live="polite">
+          <p id="mode-pattern" class="mode-pattern"></p>
+          <ol id="mode-steps" class="mode-steps" aria-label="Steps between successive mode notes"></ol>
+        </div>
+      </section>
+      <div class="fretboard-shell">
+        <div class="shell-topline" aria-hidden="true"><span>High e ↑</span><span>Standard tuning</span><span>Low E ↓</span></div>
+        <section id="fretboard" class="fretboard" aria-label="Modal guitar fretboard" tabindex="0"></section>
+        <p class="scroll-hint">Swipe or scroll horizontally to explore more frets.</p>
+      </div>
+      <footer class="stage-footer">
+        <p id="selftest" class="selftest" role="status"></p>
+        <p class="math-note">Every note and modal step is calculated from its interval formula.</p>
+      </footer>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
+    <p class="footer-meta"><span>Original note engine · Standard tuning · Built for focused practice</span><span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span></p>
+  </footer>
+  <script src="fretboard.engine.js"></script>
+  <script src="fretboard.js"></script>
+</body>
+</html>

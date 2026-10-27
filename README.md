@@ -4,12 +4,14 @@ An interactive guitar fretboard that shows the **accurate note names** for any r
 mode, or basic chord — right across the neck. It defaults to the **G major scale**
 (G A B C D E F♯), reproducing a printed "G Major Scale — Fretboard" diagram as a live web page.
 
-There are **three interactive views**:
+There are **four interactive views**:
 - **Scales** (`index.html`) — any root + scale/mode/chord across the neck.
 - **Chords** (`chords.html`) — pick a root and see the major, minor, dominant, diminished,
   suspended, added, and augmented chords as full-neck maps, every tone **colored by interval**.
 - **Progressions** (`progressions.html`) — choose a key and seven-note scale to see its diatonic
   triads or seventh chords, Roman numerals, and common progression sequences.
+- **Modes** (`modes.html`) — choose a tonic and any of the seven diatonic modes. See its fretboard,
+  complete W/H pattern, and note-to-note whole/half steps including the return to the octave.
 
 **▶ Azure production:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/ &nbsp;·&nbsp;
 **Chords:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/chords.html &nbsp;·&nbsp;
@@ -49,7 +51,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite checks all three views' control interactions, chord interval spelling,
+The browser suite checks all four views' control interactions, chord interval spelling,
 progression calculations, keyboard navigation, and mobile-width layout. The fretboard itself remains horizontally scrollable on
 narrow screens so every fret stays legible.
 
@@ -66,7 +68,7 @@ version.
   such as `v1.0.0+309bc9b`, and uploads the verified `dist/` artifact.
 - `.github/workflows/deploy.yml` is a reusable production workflow. A successful `main` CI run
   passes it the exact tested artifact, labels the deployment with the same version, deploys to
-  Azure Static Web Apps, and smoke-tests all three views plus `version.json`.
+  Azure Static Web Apps, and smoke-tests all four views plus `version.json`.
 - `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
 - `.azure/deployment-plan.md` records the Azure context, validation evidence, and rollback plan.
 
@@ -105,6 +107,7 @@ scroll horizontally and can be focused with the keyboard.
 | `index.html` | Scales page + controls |
 | `chords.html` | Chords page (interval-colored, full-neck) |
 | `progressions.html` | Diatonic chords and progression view |
+| `modes.html` | Modal fretboard and whole-step/half-step patterns |
 | `styles.css` | Fretboard + UI styling (all views) |
 | `theme.js` | Applies the light/dark theme before rendering |
 | `fretboard.engine.js` | Pure note engine (tuning, chromatic math, key-aware spelling, scale **and chord** formulas) + self-tests |

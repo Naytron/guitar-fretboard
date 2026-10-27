@@ -165,3 +165,56 @@ test('progression fretboards show the exact chord tones at every string and fret
   ], 24, 'intervals');
   expect(pageErrors).toEqual([]);
 });
+
+test('modes show all seven complete step patterns and matching fretboard positions', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: '04 Modes' }).click();
+  await expect(page.locator('#scale option')).toHaveCount(7);
+  const modes = [
+    ['major', 'W W H W W W H', [0, 2, 4, 5, 7, 9, 11]],
+    ['dorian', 'W H W W W H W', [0, 2, 3, 5, 7, 9, 10]],
+    ['phrygian', 'H W W W H W W', [0, 1, 3, 5, 7, 8, 10]],
+    ['lydian', 'W W W H W W H', [0, 2, 4, 6, 7, 9, 11]],
+    ['mixolydian', 'W W H W W H W', [0, 2, 4, 5, 7, 9, 10]],
+    ['natural_minor', 'W H W W H W W', [0, 2, 3, 5, 7, 8, 10]],
+    ['locrian', 'H W W H W W W', [0, 1, 3, 5, 6, 8, 10]],
+  ];
+  await page.locator('#root').selectOption('0');
+  for (const [mode, pattern, pitches] of modes) {
+    await page.locator('#scale').selectOption(mode);
+    await expect(page.locator('#mode-pattern')).toHaveText(pattern);
+    await expect(page.locator('#mode-steps li')).toHaveCount(7);
+    await expect(page.locator('#mode-steps li').last().locator('strong').last()).toHaveText('C');
+    const actual = await page.locator('#fretboard .fb-cell').evaluateAll(cells => cells.map(cell => ({
+      note: Boolean(cell.querySelector('.note')),
+      root: Boolean(cell.querySelector('.root')),
+    })));
+    const expected = [4, 11, 7, 2, 9, 4].flatMap(open => Array.from({ length: 16 }, (_, fret) => ({
+      note: pitches.includes((open + fret) % 12),
+      root: (open + fret) % 12 === 0,
+    })));
+    expect(actual).toEqual(expected);
+  }
+  await page.locator('#root').selectOption('7');
+  await page.locator('#scale').selectOption('dorian');
+  await expect(page.locator('#scale-notes')).toHaveText('G  ·  A  ·  B♭  ·  C  ·  D  ·  E  ·  F');
+  await page.getByLabel('Fret range').fill('24');
+  await expect(page.locator('#fretboard .fb-fretnum')).toHaveCount(25);
+  await page.locator('label[for="show-all"]').click();
+  await expect(page.locator('#fretboard .note')).toHaveCount(150);
+  await page.locator('#root').selectOption('1');
+  await page.locator('#spelling').selectOption('sharps');
+  await expect(page.locator('#scale-title')).toHaveText('C♯ Dorian');
+  await page.locator('#spelling').selectOption('flats');
+  await expect(page.locator('#scale-title')).toHaveText('D♭ Dorian');
+  await expect(page.locator('#mode-pattern')).toHaveText('W H W W W H W');
+
+  await page.setViewportSize({ width: 375, height: 812 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await expect(page.getByRole('link', { name: '04 Modes' })).toBeVisible();
+  const board = page.locator('#fretboard');
+  await board.focus();
+  await expect(board).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(() => board.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+});

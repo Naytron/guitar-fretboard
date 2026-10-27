@@ -52,6 +52,7 @@ jobs:
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/index.html
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/chords.html
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/progressions.html
+          grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/modes.html
 
       - name: Deploy ${{ inputs.version }} to Azure
         id: azure_deploy
@@ -99,6 +100,8 @@ jobs:
             grep --fixed-strings --quiet 'id="selftest"'
           curl --fail --silent --show-error --location "${site_url}/progressions.html" |
             grep --fixed-strings --quiet 'id="selftest"'
+          curl --fail --silent --show-error --location "${site_url}/modes.html" |
+            grep --fixed-strings --quiet 'id="mode-pattern"'
 
       - name: Summarize deployment
         shell: bash

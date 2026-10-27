@@ -6,6 +6,7 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
+  const modesPage = document.body.dataset.view === 'modes';
 
   const els = {
     root: $('root'),
@@ -27,7 +28,7 @@
     rootNames.forEach((label, pc) => {
       els.root.add(new Option(label, String(pc)));
     });
-    Object.entries(SCALES).forEach(([key, def]) => {
+    Object.entries(modesPage ? MODES : SCALES).forEach(([key, def]) => {
       els.scale.add(new Option(def.name, key));
     });
     // Defaults reproduce the G Major Scale diagram
@@ -40,6 +41,10 @@
     const mode = els.spelling.value;
     if (mode === 'sharps') return false;
     if (mode === 'flats') return true;
+    if (modesPage) {
+      const parentPc = (rootPc - MODES[els.scale.value].parentOffset + 12) % 12;
+      return keyPrefersFlats(parentPc, 'major');
+    }
     return keyPrefersFlats(rootPc, family); // auto
   }
 
@@ -56,9 +61,29 @@
     els.fretsOut.textContent = String(fretCount);
 
     // Readout of the selected scale's note names (accuracy at a glance)
-    const spelled = def.steps.map((s) => nameFor((rootPc + s) % 12, flats));
-    els.scaleTitle.textContent = `${nameFor(rootPc, flats)} ${def.name}`;
+    const spelled = modesPage
+      ? spellChord(rootPc, { steps: def.steps, labels: ['R', '2', '3', '4', '5', '6', '7'] }, flats)
+      : def.steps.map((s) => nameFor((rootPc + s) % 12, flats));
+    const noteNames = new Map(def.steps.map((step, index) => [(rootPc + step) % 12, spelled[index]]));
+    els.scaleTitle.textContent = `${nameFor(rootPc, flats)} ${modesPage ? MODES[scaleKey].name : def.name}`;
     els.scaleNotes.textContent = spelled.join('  ·  ');
+    if (modesPage) {
+      const pattern = modeStepPattern(def.steps);
+      $('mode-pattern').textContent = pattern.join(' ');
+      const steps = pattern.map((symbol, index) => {
+        const item = document.createElement('li');
+        const from = document.createElement('strong');
+        from.textContent = spelled[index];
+        const distance = document.createElement('span');
+        distance.className = 'mode-distance';
+        distance.textContent = `${symbol} — ${symbol === 'W' ? 'Whole step (2 frets)' : 'Half step (1 fret)'}`;
+        const to = document.createElement('strong');
+        to.textContent = spelled[(index + 1) % spelled.length];
+        item.append(from, distance, to);
+        return item;
+      });
+      $('mode-steps').replaceChildren(...steps);
+    }
 
     // Grid: 1 label column + (fretCount + 1) fret columns (0..N)
     const grid = document.createElement('div');
@@ -94,7 +119,7 @@
           if (isIn && isRoot) dot.classList.add('root');
           else if (isIn) dot.classList.add('in-scale');
           else dot.classList.add('ghost');
-          dot.textContent = nameFor(pc, flats);
+          dot.textContent = modesPage && isIn ? noteNames.get(pc) : nameFor(pc, flats);
           c.appendChild(dot);
         }
         grid.appendChild(c);
