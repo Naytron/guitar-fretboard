@@ -55,6 +55,15 @@ The browser suite checks all four views' control interactions, chord interval sp
 progression calculations, keyboard navigation, and mobile-width layout. The fretboard itself remains horizontally scrollable on
 narrow screens so every fret stays legible.
 
+The visual system uses a compact Les Paul hero, larger fret/string labels, and a GitHub
+Dark-inspired palette when the device requests dark mode. Chord and progression dots default
+to **Both** (note above interval), so interval roles do not depend on color alone. The Dot labels
+selector still offers note-only and interval-only views.
+
+On **Modes**, the W/H summary stays visible above the neck. Expand **Explore the 7 note-to-note
+steps** below the fretboard for numbered, directional transitions. This keeps the neck closer
+to the controls, especially on phones.
+
 ```powershell
 python -m http.server 8000 --directory dist
 ```
@@ -108,6 +117,7 @@ scroll horizontally and can be focused with the keyboard.
 | `chords.html` | Chords page (interval-colored, full-neck) |
 | `progressions.html` | Diatonic chords and progression view |
 | `modes.html` | Modal fretboard and whole-step/half-step patterns |
+| `les-paul.svg` | Locally served CC0 Les Paul illustration used in every hero |
 | `styles.css` | Fretboard + UI styling (all views) |
 | `theme.js` | Applies the light/dark theme before rendering |
 | `fretboard.engine.js` | Pure note engine (tuning, chromatic math, key-aware spelling, scale **and chord** formulas) + self-tests |
@@ -121,9 +131,16 @@ scroll horizontally and can be focused with the keyboard.
 | `azure.yaml`, `infra/` | Azure Developer CLI and Bicep infrastructure |
 
 ## Notes on originality
-All code and note data here are **original** and computed from music theory first principles. This
+The application code and note data here are **original** and computed from music theory first principles. This
 demo intentionally contains **no tablature, lyrics, or copyrighted diagrams**. It's a companion to
 my personal (private) guitar practice library.
+
+The hero illustration is **Gibson Les Paul** by **piemaster**, originally from Open Clip Art and
+available on [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gibson_Les_Paul.svg).
+It is released under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/),
+and adapted here with a sunburst body finish on a transparent background.
+The illustration is served locally, without third-party image requests. Guitar names identify
+the instrument depicted; this project is not affiliated with or endorsed by Gibson.
 
 ---
 *MIT-style personal project — use it, learn from it, tune up. 🤘*

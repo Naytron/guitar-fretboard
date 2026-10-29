@@ -28,9 +28,15 @@
     </div>
     <div class="hero">
       <div class="hero-copy">
+        <p class="hero-eyebrow">Seven patterns. Seven colors.</p>
         <h1>Change the steps.<br /><em>Find the mode.</em></h1>
         <p class="tagline">Explore seven modal colors from any tonic. Follow the whole and half steps, then find those notes across the neck.</p>
+        <a class="hero-action" href="#workspace">Find your mode <span aria-hidden="true">→</span></a>
       </div>
+      <figure class="hero-instrument">
+        <img class="hero-guitar" src="les-paul.svg" alt="Sunburst Les Paul electric guitar" width="219" height="642" fetchpriority="high" />
+        <figcaption>Same strings. A different perspective.</figcaption>
+      </figure>
     </div>
   </header>
   <main id="workspace" class="workspace">
@@ -86,7 +92,6 @@
         <p>W = whole step (2 frets). H = half step (1 fret). The final step returns to the tonic one octave higher.</p>
         <div aria-live="polite">
           <p id="mode-pattern" class="mode-pattern"></p>
-          <ol id="mode-steps" class="mode-steps" aria-label="Steps between successive mode notes"></ol>
         </div>
       </section>
       <div class="fretboard-shell">
@@ -94,6 +99,10 @@
         <section id="fretboard" class="fretboard" aria-label="Modal guitar fretboard" tabindex="0"></section>
         <p class="scroll-hint">Swipe or scroll horizontally to explore more frets.</p>
       </div>
+      <details class="mode-details">
+        <summary>Explore the 7 note-to-note steps</summary>
+        <ol id="mode-steps" class="mode-steps" aria-label="Steps between successive mode notes" aria-live="polite"></ol>
+      </details>
       <footer class="stage-footer">
         <p id="selftest" class="selftest" role="status"></p>
         <p class="math-note">Every note and modal step is calculated from its interval formula.</p>
@@ -102,7 +111,7 @@
   </main>
   <footer class="site-footer">
     <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
-    <p class="footer-meta"><span>Original note engine · Standard tuning · Built for focused practice</span><span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span></p>
+    <p class="footer-meta"><span>Original note engine · Standard tuning · Built for focused practice</span><a class="image-credit" href="https://commons.wikimedia.org/wiki/File:Gibson_Les_Paul.svg">Les Paul art: piemaster · CC0</a><span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span></p>
   </footer>
   <script src="fretboard.engine.js"></script>
   <script src="fretboard.js"></script>

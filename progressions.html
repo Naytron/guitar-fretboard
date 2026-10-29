@@ -30,18 +30,18 @@
 
     <div class="hero hero-chords">
       <div class="hero-copy">
+        <p class="hero-eyebrow">Turn chord theory into movement</p>
         <h1>Find the chords.<br /><em>Build the movement.</em></h1>
         <p class="tagline">
           Choose a key and scale to reveal its diatonic chords, Roman numerals, and familiar
           progressions—with every chord tone spelled for its musical role.
         </p>
+        <a class="hero-action" href="#workspace">Build a progression <span aria-hidden="true">→</span></a>
       </div>
-      <div class="hero-instrument" aria-hidden="true">
-        <div class="pick-display">
-          <span class="pick-shape pick-chord"><span class="pick-hole"></span></span>
-          <p><strong>One scale.</strong><br />Many ways forward.</p>
-        </div>
-      </div>
+      <figure class="hero-instrument">
+        <img class="hero-guitar" src="les-paul.svg" alt="Sunburst Les Paul electric guitar" width="219" height="642" fetchpriority="high" />
+        <figcaption>One key. Find your next chord.</figcaption>
+      </figure>
     </div>
   </header>
 
@@ -95,9 +95,9 @@
         <div class="control">
           <label for="label-mode"><span class="control-label">Dot labels</span><span class="control-help">Notes, intervals, or both</span></label>
           <select id="label-mode">
-            <option value="notes" selected>Note names</option>
+            <option value="notes">Note names</option>
             <option value="intervals">Intervals</option>
-            <option value="both">Both</option>
+            <option value="both" selected>Both</option>
           </select>
         </div>
       </div>
@@ -119,6 +119,7 @@
           <h2 id="progression-heading">Progression map</h2>
           <p id="progression-caption" class="stage-description" aria-live="polite"></p>
           <p class="stage-description">Each neck shows all positions of that chord's tones, not a single fingering. Scroll horizontally to explore more frets.</p>
+          <p class="stage-description">Dots show the note above its interval: R = root, 3 = third, 5 = fifth. Use Dot labels to switch views.</p>
         </div>
         <div class="legend interval-legend" aria-label="Interval color legend">
           <span class="key"><span class="swatch cat-root"></span> Root</span>
@@ -139,6 +140,7 @@
     <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
     <p class="footer-meta">
       <span>Original note engine · Standard tuning · Built for focused practice</span>
+      <a class="image-credit" href="https://commons.wikimedia.org/wiki/File:Gibson_Les_Paul.svg">Les Paul art: piemaster · CC0</a>
       <span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span>
     </p>
   </footer>

@@ -45,35 +45,18 @@
 
     <div class="hero hero-chords">
       <div class="hero-copy">
+        <p class="hero-eyebrow">Learn the role of every note</p>
         <h1>One root.<br /><em>Every color.</em></h1>
         <p class="tagline">
           Compare chord qualities without losing your place on the neck. See how thirds, fifths,
           sevenths, and extensions reshape the sound—note by note.
         </p>
+        <a class="hero-action" href="#workspace">Compare chord tones <span aria-hidden="true">→</span></a>
       </div>
-
-      <div class="hero-instrument" aria-hidden="true">
-        <div class="pick-display">
-          <span class="pick-shape pick-chord"><span class="pick-hole"></span></span>
-          <p><strong>Change one interval.</strong><br />Hear a whole new character.</p>
-        </div>
-        <div class="neck-sculpture chord-sculpture">
-          <span class="mini-fret fret-1"></span>
-          <span class="mini-fret fret-2"></span>
-          <span class="mini-fret fret-3"></span>
-          <span class="mini-fret fret-4"></span>
-          <span class="mini-string string-1"></span>
-          <span class="mini-string string-2"></span>
-          <span class="mini-string string-3"></span>
-          <span class="mini-string string-4"></span>
-          <span class="mini-string string-5"></span>
-          <span class="mini-string string-6"></span>
-          <span class="mini-note note-a"></span>
-          <span class="mini-note note-b"></span>
-          <span class="mini-note note-c"></span>
-          <span class="mini-note note-d"></span>
-        </div>
-      </div>
+      <figure class="hero-instrument">
+        <img class="hero-guitar" src="les-paul.svg" alt="Sunburst Les Paul electric guitar" width="219" height="642" fetchpriority="high" />
+        <figcaption>Small intervals. Big changes.</figcaption>
+      </figure>
     </div>
   </header>
 
@@ -119,9 +102,9 @@
             <span class="control-help">Notes, intervals, or both</span>
           </label>
           <select id="label-mode">
-            <option value="notes" selected>Note names</option>
+            <option value="notes">Note names</option>
             <option value="intervals">Intervals</option>
-            <option value="both">Both</option>
+            <option value="both" selected>Both</option>
           </select>
         </div>
       </div>
@@ -132,6 +115,7 @@
         <div>
           <h2 id="atlas-heading">Chord quality atlas</h2>
           <p class="stage-description">Each color represents a job inside the chord, not just a note name.</p>
+          <p class="stage-description">Dots show the note above its interval: R = root, 3 = third, 5 = fifth. Use Dot labels to switch views.</p>
         </div>
         <div class="legend interval-legend" aria-label="Interval color legend">
           <span class="key"><span class="swatch cat-root"></span> Root</span>
@@ -187,6 +171,7 @@
     <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
     <p class="footer-meta">
       <span>Original note engine · Standard tuning · Built for focused practice</span>
+      <a class="image-credit" href="https://commons.wikimedia.org/wiki/File:Gibson_Les_Paul.svg">Les Paul art: piemaster · CC0</a>
       <span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span>
     </p>
   </footer>

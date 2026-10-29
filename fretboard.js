@@ -72,6 +72,9 @@
       $('mode-pattern').textContent = pattern.join(' ');
       const steps = pattern.map((symbol, index) => {
         const item = document.createElement('li');
+        const number = document.createElement('span');
+        number.className = 'mode-step-number';
+        number.textContent = `Step ${index + 1}`;
         const from = document.createElement('strong');
         from.textContent = spelled[index];
         const distance = document.createElement('span');
@@ -79,7 +82,13 @@
         distance.textContent = `${symbol} — ${symbol === 'W' ? 'Whole step (2 frets)' : 'Half step (1 fret)'}`;
         const to = document.createElement('strong');
         to.textContent = spelled[(index + 1) % spelled.length];
-        item.append(from, distance, to);
+        const arrow = document.createElement('span');
+        arrow.textContent = '→';
+        arrow.setAttribute('aria-hidden', 'true');
+        const transition = document.createElement('div');
+        transition.className = 'mode-transition';
+        transition.append(from, arrow, to);
+        item.append(number, transition, distance);
         return item;
       });
       $('mode-steps').replaceChildren(...steps);
@@ -88,6 +97,7 @@
     // Grid: 1 label column + (fretCount + 1) fret columns (0..N)
     const grid = document.createElement('div');
     grid.className = 'fb-grid';
+    grid.style.setProperty('--fret-count', String(fretCount + 1));
     grid.style.gridTemplateColumns = `var(--label-col) repeat(${fretCount + 1}, 1fr)`;
 
     // Header row: blank label + fret numbers with inlay markers

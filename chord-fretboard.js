@@ -4,6 +4,7 @@ function renderChordFretboard(rootPc, chord, notes, fretCount, labelMode) {
   const names = new Map(chord.steps.map((step, index) => [(rootPc + step) % 12, notes[index]]));
   const grid = document.createElement('div');
   grid.className = 'fb-grid chord-grid';
+  grid.style.setProperty('--fret-count', String(fretCount + 1));
   grid.style.gridTemplateColumns = `var(--label-col) repeat(${fretCount + 1}, 1fr)`;
 
   function cell(className, text = '') {

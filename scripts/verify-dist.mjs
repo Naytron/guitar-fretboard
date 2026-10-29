@@ -11,6 +11,7 @@ const expectedFiles = [
   'fretboard.engine.js',
   'fretboard.js',
   'index.html',
+  'les-paul.svg',
   'modes.html',
   'progressions.html',
   'progressions.js',

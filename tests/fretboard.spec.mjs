@@ -1,5 +1,39 @@
 import { expect, test } from '@playwright/test';
 
+test('secondary text and accuracy badges retain readable contrast in both themes', async ({ page }) => {
+  for (const theme of ['light', 'dark']) {
+    for (const file of ['index', 'chords', 'progressions', 'modes']) {
+      await page.goto(`/${file}.html?scoutTheme=${theme}`);
+      const ratios = await page.evaluate(() => {
+        function luminance(color) {
+          return color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => {
+            const channel = value / 255;
+            return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+          }).reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+        }
+        return ['.brand-copy small', '.control-help', '.selftest.ok'].map(selector => {
+          const element = document.querySelector(selector);
+          const foreground = luminance(getComputedStyle(element).color);
+          let ancestor = element;
+          while (ancestor) {
+            const background = getComputedStyle(ancestor).backgroundColor;
+            const channels = background.match(/[\d.]+/g).map(Number);
+            if (channels.length === 3 || channels[3] === 1) {
+              const lightness = luminance(background);
+              return { selector, ratio: (Math.max(foreground, lightness) + 0.05) / (Math.min(foreground, lightness) + 0.05) };
+            }
+            ancestor = ancestor.parentElement;
+          }
+          throw new Error(`Missing opaque background for ${selector}`);
+        });
+      });
+      for (const { selector, ratio } of ratios) {
+        expect(ratio, `${file} ${theme} ${selector} contrast`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  }
+});
+
 test('scale controls update the fretboard and keep labeled keyboard access', async ({ page }) => {
   await page.goto('/');
 
@@ -26,6 +60,7 @@ test('chord controls render interval-spelled notes and all qualities', async ({ 
 
   await expect(page.getByRole('status')).toContainText('chord-accuracy self-test passed');
   await expect(page.locator('.chord-card')).toHaveCount(9);
+  await expect(page.getByLabel('Dot labels')).toHaveValue('both');
   await page.getByLabel('Root note').selectOption('0');
   await page.getByLabel('Note spelling').selectOption('flats');
   await page.getByLabel('Dot labels').selectOption('both');
@@ -33,6 +68,11 @@ test('chord controls render interval-spelled notes and all qualities', async ({ 
   const c7 = page.locator('.chord-card').filter({ has: page.getByRole('heading', { name: /Dominant 7/ }) });
   await expect(c7.locator('.chord-notes')).toHaveText('C · E · G · B♭');
   await expect(c7.locator('.note[title="B♭ — ♭7"]').first()).toBeVisible();
+  await expect(c7.locator('.note[title="B♭ — ♭7"]').first()).toHaveText('B♭♭7');
+  await page.getByLabel('Dot labels').selectOption('notes');
+  await expect(c7.locator('.note[title="B♭ — ♭7"]').first()).toHaveText('B♭');
+  await page.getByLabel('Dot labels').selectOption('intervals');
+  await expect(c7.locator('.note[title="B♭ — ♭7"]').first()).toHaveText('♭7');
 
   await page.getByLabel('Root note').selectOption('5');
   await page.getByLabel('Note spelling').selectOption('auto');
@@ -96,7 +136,7 @@ test('progression view maps selected scale degrees to chords and Roman numerals'
   await expect(page.locator('.progression-card')).toHaveCount(4);
 });
 
-async function expectProgressionPositions(page, chords, frets = 12, labelMode = 'notes') {
+async function expectProgressionPositions(page, chords, frets = 12, labelMode = 'both') {
   const necks = page.locator('.progression-fretboard');
   await expect(necks).toHaveCount(chords.length);
   for (const [index, tones] of chords.entries()) {
@@ -133,6 +173,7 @@ test('progression fretboards show the exact chord tones at every string and fret
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto('/progressions.html');
+  await expect(page.getByLabel('Dot labels')).toHaveValue('both');
   await expectProgressionPositions(page, [
     [[7, 'G', 'R'], [11, 'B', '3'], [2, 'D', '5']],
     [[2, 'D', 'R'], [6, 'F♯', '3'], [9, 'A', '5']],
@@ -152,6 +193,9 @@ test('progression fretboards show the exact chord tones at every string and fret
     [[5, 'F', 'R'], [8, 'A♭', '♭3'], [0, 'C', '5'], [3, 'E♭', '♭7']],
   ];
   await expectProgressionPositions(page, minorSequence, 12, 'both');
+  await page.getByLabel('Dot labels').selectOption('notes');
+  await expectProgressionPositions(page, minorSequence, 12, 'notes');
+  await page.getByLabel('Dot labels').selectOption('both');
   await page.getByLabel('Fret range').fill('24');
   await expect(page.locator('#frets-out')).toHaveText('24');
   await expectProgressionPositions(page, minorSequence, 24, 'both');
@@ -170,6 +214,13 @@ test('modes show all seven complete step patterns and matching fretboard positio
   await page.goto('/');
   await page.getByRole('link', { name: '04 Modes' }).click();
   await expect(page.locator('#scale option')).toHaveCount(7);
+  await expect(page.locator('.mode-details')).not.toHaveAttribute('open', '');
+  await expect(page.locator('#mode-pattern')).toBeVisible();
+  await page.getByText('Explore the 7 note-to-note steps', { exact: true }).click();
+  await expect(page.locator('#mode-steps')).toBeVisible();
+  await expect(page.locator('.mode-step-number')).toHaveText([
+    'Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5', 'Step 6', 'Step 7',
+  ]);
   const modes = [
     ['major', 'W W H W W W H', [0, 2, 4, 5, 7, 9, 11]],
     ['dorian', 'W H W W W H W', [0, 2, 3, 5, 7, 9, 10]],
@@ -184,6 +235,8 @@ test('modes show all seven complete step patterns and matching fretboard positio
     await page.locator('#scale').selectOption(mode);
     await expect(page.locator('#mode-pattern')).toHaveText(pattern);
     await expect(page.locator('#mode-steps li')).toHaveCount(7);
+    await expect(page.locator('#mode-steps')).toBeVisible();
+    await expect(page.locator('.mode-transition [aria-hidden="true"]')).toHaveText(Array(7).fill('→'));
     await expect(page.locator('#mode-steps li').last().locator('strong').last()).toHaveText('C');
     const actual = await page.locator('#fretboard .fb-cell').evaluateAll(cells => cells.map(cell => ({
       note: Boolean(cell.querySelector('.note')),
@@ -218,3 +271,51 @@ test('modes show all seven complete step patterns and matching fretboard positio
   await page.keyboard.press('ArrowRight');
   await expect.poll(() => board.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
 });
+
+for (const theme of ['light', 'dark']) {
+  for (const width of [375, 768, 1280, 1920]) {
+    test(`practice-first layout and Les Paul hero at ${width}px in ${theme}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      for (const file of ['index', 'chords', 'progressions', 'modes']) {
+        await page.goto(`/${file}.html?scoutTheme=${theme}`);
+        const guitar = page.getByRole('img', { name: 'Sunburst Les Paul electric guitar' });
+        await expect(guitar).toBeVisible();
+        expect(await guitar.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+        expect(await page.locator('.hero-instrument').evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        expect(await page.locator('.hero').evaluate(el => el.getBoundingClientRect().height)).toBeLessThan(400);
+
+        if (theme === 'dark') {
+          expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(13, 17, 23)');
+        }
+        if (width >= 1280 && (file === 'index' || file === 'modes')) {
+          expect(await page.locator('#fretboard').evaluate(el => el.getBoundingClientRect().top)).toBeLessThan(850);
+        }
+        const fontSizes = await page.locator('.fb-fretnum, .fb-string-label').evaluateAll(elements => (
+          elements.map(el => parseFloat(getComputedStyle(el).fontSize))
+        ));
+        expect(Math.min(...fontSizes)).toBeGreaterThanOrEqual(14);
+
+        await page.locator('#frets').fill(file === 'chords' ? '15' : '24');
+        const hasOverlappingDots = await page.locator('.fb-cell').evaluateAll(cells => cells.some(cell => {
+          const dot = cell.querySelector('.note');
+          return dot && dot.getBoundingClientRect().width > cell.getBoundingClientRect().width;
+        }));
+        expect(hasOverlappingDots).toBe(false);
+        if (file === 'modes') {
+          const details = page.locator('.mode-details');
+          await details.locator('summary').focus();
+          await page.keyboard.press('Enter');
+          await expect(details).toHaveAttribute('open', '');
+          await expect(page.locator('#mode-steps li')).toHaveCount(7);
+          if (width === 375) {
+            const positions = await page.locator('#mode-steps li').evaluateAll(items => items.map(item => item.getBoundingClientRect().top));
+            expect(positions.every((top, index) => index === 0 || top > positions[index - 1])).toBe(true);
+          }
+          await page.keyboard.press('Enter');
+          await expect(page.locator('#mode-steps')).not.toBeVisible();
+        }
+      }
+    });
+  }
+}

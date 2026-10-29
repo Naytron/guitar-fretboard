@@ -19,6 +19,7 @@ const publicFiles = [
   'chords.html',
   'progressions.html',
   'modes.html',
+  'les-paul.svg',
   'styles.css',
   'theme.js',
   'fretboard.engine.js',
