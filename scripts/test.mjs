@@ -58,6 +58,7 @@ const JavaScriptFiles = [
   'tests/quiz.spec.mjs',
   'tests/mobile-practice.spec.mjs',
   'tests/lessons.spec.mjs',
+  'tests/practice-tools.spec.mjs',
 ];
 
 for (const file of JavaScriptFiles) {

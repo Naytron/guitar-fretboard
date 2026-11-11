@@ -118,8 +118,8 @@ scroll horizontally and can be focused with the keyboard.
 
 ## Quiz practice
 
-Open `quiz.html` and choose **Fretboard notes**, **Intervals**, **Chord tones**, or **Roman
-numerals**. Sessions are ten questions with no timer. Answer using the labeled buttons, or
+Open `quiz.html` and choose **Fretboard notes**, **Intervals**, **Chord tones**, **Roman
+numerals**, or **Modes**. Sessions are ten questions with no timer. Answer using the labeled buttons, or
 select a position in the **Find a note** exercise. On the interactive neck, arrow keys move,
 Home/End jump to the beginning/end, and Enter/Space submits. Feedback is announced and focus
 moves to Next; the learner controls when to continue.
@@ -133,7 +133,10 @@ moves to Next; the learner controls when to continue.
 - **Chords:** start with major/minor triads. The harder setting adds diminished, augmented,
   and dominant-seventh chords. Note names follow the selected key/spelling context.
 - **Roman numerals:** match degrees and chords in major or natural-minor keys using triads.
-  Modal harmony, seventh-chord numeral questions, and dedicated mode quizzes are not included.
+  Modal harmony and seventh-chord numeral questions are not included.
+- **Modes:** name the mode from its W/H step pattern, from its degree of a parent major key,
+  find the parent major of a given mode, or pick the characteristic tone that separates a mode
+  from its parallel major or minor.
 
 Scores count only unassisted first answers. A hint or reveal makes that question assisted.
 The results explain missed skills and offer a separate retry round without changing the original
@@ -163,10 +166,33 @@ quiz activity and settings via URL query parameters (`quiz.html?activity=chords&
 Quiz validates presets and ignores invalid ones. The chosen level is remembered per page under the
 `fretboard-lab.lessons.v1` localStorage key.
 
+Each Learn panel ends with a **learning path** footer: the latest first-attempt score from the
+matching quiz activity (read from the Quiz's saved history), a **Mark as learned** toggle per
+level (a ✓ appears on the tab), and a "*N* of 3 levels learned" progress line. Learned levels are
+stored alongside the level preference under `fretboard-lab.lessons.v1`.
+
 The Modes page also shows **the seven modes in order** (Ionian → Locrian): each chip lists its
 degree, the tonic it starts on inside the current parent major key, its W/H step pattern, and its
 characteristic tone(s). Clicking a chip selects that mode and tonic; the sentence above it states
 "*X Mode* is degree *N* of *Y* major — same seven notes, new home."
+
+## Practice tools
+
+- **Shareable URLs.** Every control on the theory pages is mirrored into the query string
+  (`modes.html?key=2&mode=dorian&compare=true&pos=1`). Defaults are omitted, invalid values are
+  ignored and cleaned from the address bar, and **Copy link** puts the current URL on the
+  clipboard (with a text-selection fallback).
+- **Playback.** Scales, modes, each chord card, each diatonic chord, and the selected progression
+  have a **Play** button backed by the Web Audio API — a short plucked tone per note, generated
+  from the engine's pitch classes. No audio files are shipped; nothing plays until you press Play.
+- **Compare with parallel major** (Modes). Marks degrees lowered or raised relative to the major
+  scale on the same tonic (amber), ghosts the notes that exist only in the parallel major (dashed),
+  and summarises the difference ("♭3 = F ♭7 = C — 2 degrees lowered").
+- **Position filter** (Scales, Modes). Choose Whole neck or Positions 1–5: a five-fret window
+  anchored on the low-E root in CAGED order dims every other note so you can learn one shape
+  at a time.
+- **Print.** A print stylesheet strips navigation, controls, and buttons, fits the fretboard to
+  the page, and keeps the current lesson and the mode strip, so any view prints as a handout.
 
 ## Files
 | File | Purpose |
@@ -181,6 +207,8 @@ characteristic tone(s). Clicking a chip selects that mode and tonic; the sentenc
 | `lessons.js` | Lesson content (12 lessons), live context builder, and quiz-preset links |
 | `lessons.ui.js`, `lessons.css` | Accessible three-level lesson tab panel and mode strip styling |
 | `practice-layout.js` | Responsive native disclosures for diagram controls |
+| `page-state.js` | Mirrors validated control state to the URL and powers Copy link |
+| `playback.js` | Web Audio plucked-tone playback for scales, chords, and progressions |
 | `les-paul.svg` | Locally served CC0 Les Paul illustration used in every hero |
 | `styles.css` | Fretboard + UI styling (all views) |
 | `theme.js` | Applies the light/dark theme before rendering |

@@ -678,6 +678,10 @@ code {
   white-space: nowrap;
 }
 
+.legend .key[hidden] {
+  display: none;
+}
+
 .swatch {
   display: inline-block;
   width: 0.7rem;
