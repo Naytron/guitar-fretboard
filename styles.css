@@ -969,6 +969,60 @@ code {
   overflow-wrap: anywhere;
 }
 
+/* Playback buttons */
+.play-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.play-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--cp-accent);
+  border-radius: 999px;
+  background: var(--cp-accent-soft);
+  color: var(--cp-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.play-button:hover {
+  filter: brightness(1.08);
+}
+
+.play-button:focus-visible {
+  outline: 2px solid var(--cp-accent);
+  outline-offset: 2px;
+}
+
+.play-button[aria-pressed="true"] {
+  background: var(--cp-accent);
+  color: var(--cp-on-accent, #fff);
+}
+
+.play-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.play-button-small {
+  min-height: 36px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.chord-head .play-button-small {
+  margin-top: 0.35rem;
+}
+
 /* --------------------------------------------------------------------------
    Chord gallery
    -------------------------------------------------------------------------- */

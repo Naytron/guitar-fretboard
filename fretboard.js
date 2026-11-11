@@ -225,6 +225,8 @@
     populate();
     PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll });
     PageState.wireShare();
+    $('play-controls')?.append(Playback.button(modesPage ? 'Play mode' : 'Play scale', (done) =>
+      Playback.playMelody(Playback.scaleMidis(parseInt(els.root.value, 10), SCALES[els.scale.value].steps), done)));
     wire();
     render();
     showSelfTest();

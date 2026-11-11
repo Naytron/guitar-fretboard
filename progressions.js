@@ -21,6 +21,7 @@
     badge: $('selftest'),
   };
 
+  let sequence = [];
   const roots = ['C', 'C♯ / D♭', 'D', 'D♯ / E♭', 'E', 'F', 'F♯ / G♭', 'G', 'G♯ / A♭', 'A', 'A♯ / B♭', 'B'];
   const progressionSteps = () => els.progression.value.split(',').map((degree) => Number(degree) - 1);
 
@@ -51,12 +52,12 @@
       const notes = document.createElement('p');
       notes.className = 'diatonic-notes';
       notes.textContent = chord.notes.join(' · ');
-      card.append(heading, name, notes);
+      card.append(heading, name, notes, Playback.button('Play', (done) => Playback.playChord(Playback.chordMidis(chord.root, chord.steps), done), 'play-button play-button-small'));
       return card;
     });
     els.chords.replaceChildren(...chordCards);
 
-    const sequence = progressionSteps().map((degree) => chords[degree]);
+    sequence = progressionSteps().map((degree) => chords[degree]);
     els.progressionCaption.textContent = sequence.map((chord) => chord.roman).join('  →  ');
     const progressionCards = sequence.map((chord, index) => {
       const item = document.createElement('li');
@@ -110,6 +111,8 @@
     populate();
     PageState.bind({ key: els.root, scale: els.scale, spelling: els.spelling, chords: els.chordType, progression: els.progression, frets: els.frets, labels: els.labelMode });
     PageState.wireShare();
+    $('play-controls').append(Playback.button('Play progression', (done) =>
+      Playback.playProgression(sequence.map((chord) => Playback.chordMidis(chord.root, chord.steps)), done)));
     [els.root, els.scale, els.spelling, els.chordType, els.progression, els.frets, els.labelMode].forEach((control) => {
       control.addEventListener('change', render);
     });

@@ -50,6 +50,7 @@
       `<span class="chord-fullname">${chord.name}</span></h3>` +
       `<p class="chord-sub"><span class="chord-notes">${notes.join(' · ')}</span>` +
       `<span class="chord-formula">${chord.labels.join(' ')}</span></p>`;
+    head.appendChild(Playback.button('Play', (done) => Playback.playChord(Playback.chordMidis(rootPc, chord.steps), done), 'play-button play-button-small'));
     card.appendChild(head);
 
     const neck = document.createElement('div');
