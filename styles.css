@@ -1822,3 +1822,45 @@ code {
     transition: none;
   }
 }
+
+/* Parallel-major comparison (Modes) */
+.note.altered {
+  background: var(--cp-warning);
+  color: #1a1a1a;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cp-warning) 35%, transparent);
+}
+
+.note.ghost.parallel {
+  border: 2px dashed var(--cp-accent);
+  color: var(--cp-text-muted);
+}
+
+.swatch.altered {
+  background: var(--cp-warning);
+}
+
+.swatch.parallel {
+  border: 2px dashed var(--cp-accent);
+  background: var(--cp-surface);
+}
+
+.compare-summary {
+  flex-basis: 100%;
+  margin: 0.25rem 0 0;
+  color: var(--cp-text-muted);
+  font-size: 0.875rem;
+}
+
+.compare-summary strong {
+  color: var(--cp-text);
+}
+
+.compare-chip {
+  display: inline-block;
+  padding: 0 0.45em;
+  border-radius: 0.35em;
+  background: var(--cp-warning);
+  color: #1a1a1a;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}

@@ -15,6 +15,7 @@
     fretsOut: $('frets-out'),
     spelling: $('spelling'),
     showAll: $('show-all'),
+    compare: $('compare-major'),
     board: $('fretboard'),
     scaleNotes: $('scale-notes'),
     scaleTitle: $('scale-title'),
@@ -53,6 +54,9 @@
     const showAll = els.showAll.checked;
     const flats = useFlatsFor(rootPc);
     const inScale = scaleSet(rootPc, def.steps);
+    const compare = Boolean(els.compare?.checked);
+    const inMajor = compare ? scaleSet(rootPc, SCALES.major.steps) : null;
+    if (modesPage) renderComparison(rootPc, scaleKey, flats, compare);
 
     els.fretsOut.textContent = String(fretCount);
 
@@ -122,12 +126,15 @@
         const pc = noteAt(str.pc, f);
         const isIn = inScale.has(pc);
         const isRoot = pc === rootPc;
-        if (isIn || showAll) {
+        const inParallel = compare && inMajor.has(pc);
+        if (isIn || showAll || inParallel) {
           const dot = document.createElement('span');
           dot.className = 'note';
           if (isIn && isRoot) dot.classList.add('root');
           else if (isIn) dot.classList.add('in-scale');
+          else if (inParallel) dot.classList.add('ghost', 'parallel');
           else dot.classList.add('ghost');
+          if (compare && isIn && !isRoot && !inMajor.has(pc)) dot.classList.add('altered');
           dot.textContent = isIn ? noteNames.get(pc) : nameFor(pc, flats);
           c.appendChild(dot);
         }
@@ -144,6 +151,34 @@
     c.className = cls;
     if (text) c.textContent = text;
     return c;
+  }
+
+  /* ---- Parallel-major comparison: legend keys and altered-degree summary ---- */
+  function renderComparison(rootPc, modeKey, flats, enabled) {
+    const summary = $('compare-summary');
+    if (!summary) return;
+    document.querySelectorAll('.compare-key').forEach((key) => { key.hidden = !enabled; });
+    summary.hidden = !enabled;
+    if (!enabled) return;
+    const tonic = nameFor(rootPc, flats);
+    const labels = scaleDegreeLabels(SCALES[modeKey]);
+    const modeNotes = spellScale(rootPc, SCALES[modeKey], flats);
+    const altered = labels.map((label, index) => ({ label, note: modeNotes[index] })).filter(({ label }) => /[♭♯]/.test(label));
+    summary.replaceChildren();
+    const lead = document.createElement('strong');
+    lead.textContent = `Compared with ${tonic} major: `;
+    summary.append(lead);
+    if (!altered.length) {
+      summary.append('identical — Ionian is the major scale.');
+      return;
+    }
+    altered.forEach(({ label, note }, index) => {
+      const chip = document.createElement('span');
+      chip.className = 'compare-chip';
+      chip.textContent = `${label} = ${note}`;
+      summary.append(chip, index < altered.length - 1 ? ' ' : '');
+    });
+    summary.append(` — ${altered.length === 1 ? 'one degree' : `${altered.length} degrees`} ${altered.some(a => a.label.includes('♯')) && altered.some(a => a.label.includes('♭')) ? 'changed' : altered[0].label.includes('♯') ? 'raised' : 'lowered'}.`);
   }
 
   /* ---- Mode order strip: Ionian → Locrian, degree, pattern, and parent key ---- */
@@ -208,6 +243,7 @@
       els.frets.addEventListener(ev, render);
       els.spelling.addEventListener(ev, render);
       els.showAll.addEventListener(ev, render);
+      els.compare?.addEventListener(ev, render);
     });
     $('mode-strip')?.addEventListener('keydown', onStripKey);
   }
@@ -223,7 +259,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
-    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll });
+    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll, compare: els.compare });
     PageState.wireShare();
     $('play-controls')?.append(Playback.button(modesPage ? 'Play mode' : 'Play scale', (done) =>
       Playback.playMelody(Playback.scaleMidis(parseInt(els.root.value, 10), SCALES[els.scale.value].steps), done)));

@@ -78,6 +78,13 @@
                 <span class="toggle-copy"><strong>Show every note</strong><small>Dim notes outside the mode</small></span>
               </label>
             </div>
+            <div class="control control-check">
+              <input type="checkbox" id="compare-major" />
+              <label for="compare-major">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span class="toggle-copy"><strong>Compare with parallel major</strong><small>Ghost the major scale and mark altered degrees</small></span>
+              </label>
+            </div>
           </div>
         </details>
       </div>
@@ -88,11 +95,14 @@
           <h2 id="scale-title" class="scale-title">G Ionian (major)</h2>
           <p id="scale-notes" class="scale-notes"></p>
             <div id="play-controls" class="play-controls"></div>
+            <p id="compare-summary" class="compare-summary" aria-live="polite" hidden></p>
         </div>
         <div class="legend" aria-label="Fretboard legend">
           <span class="key"><span class="swatch root"></span> Tonic</span>
           <span class="key"><span class="swatch in-scale"></span> Mode tone</span>
           <span class="key"><span class="swatch ghost"></span> Outside mode</span>
+          <span class="key compare-key" hidden><span class="swatch altered"></span> Altered from major</span>
+          <span class="key compare-key" hidden><span class="swatch parallel"></span> Only in parallel major</span>
         </div>
       </header>
       <div class="fretboard-shell">
