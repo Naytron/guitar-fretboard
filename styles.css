@@ -473,11 +473,11 @@ code {
 .control {
   display: flex;
   min-width: 0;
-  min-height: 6rem;
+  min-height: 5.5rem;
   flex-direction: column;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid var(--cp-border);
   border-radius: 0.625rem;
   background: var(--cp-surface-soft);
@@ -609,6 +609,7 @@ code {
 
 .toggle-copy {
   display: grid;
+  min-width: 0;
   gap: 0.15rem;
 }
 
@@ -1242,8 +1243,19 @@ code {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* Scales and Modes carry too many settings to share a row with Key and Scale. */
+.scale-controls,
+.mode-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.scale-controls .practice-settings,
+.mode-controls .practice-settings {
+  grid-column: 1 / -1;
+}
+
 .mode-controls .settings-controls {
-  grid-template-columns: 1fr 1fr 1fr 1.35fr 1.35fr;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .progression-stage {

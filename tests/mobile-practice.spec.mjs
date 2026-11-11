@@ -167,6 +167,17 @@ test('responsive defaults keep desktop settings available and all five navigatio
         return { left: bounds.left, right: bounds.right };
       }));
       expect(navBounds.every(bounds => bounds.left >= 0 && bounds.right <= width)).toBe(true);
+      if (width > 600) {
+        const overflowing = await page.locator('.control-label, .control-help, .control-value, .toggle-copy').evaluateAll(elements => elements
+          .filter(element => element.getBoundingClientRect().width > 0)
+          .map(element => ({
+            text: element.textContent.trim(),
+            overflow: Math.round(element.getBoundingClientRect().right - element.closest('.control').getBoundingClientRect().right),
+            clipped: element.scrollWidth - element.clientWidth,
+          }))
+          .filter(entry => entry.overflow > 0 || entry.clipped > 1));
+        expect(overflowing, `${view} @ ${width}px`).toEqual([]);
+      }
     }
   }
   await page.goto('/progressions.html');
