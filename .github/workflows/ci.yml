@@ -22,7 +22,7 @@ jobs:
   build:
     name: Test and build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     outputs:
       artifact_name: ${{ steps.version.outputs.artifact_name }}
       version: ${{ steps.version.outputs.version }}
@@ -66,8 +66,25 @@ jobs:
       - name: Build versioned static artifact
         run: npm run build
 
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright Chromium
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
       - name: Install Chromium for browser tests
-        run: npx playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      # The hosted Ubuntu image already ships Chrome's shared libraries; apt is
+      # best-effort so a flaky mirror cannot stall the job.
+      - name: Install Chromium system dependencies (best effort)
+        run: timeout 180 npx playwright install-deps chromium || echo "::warning::Skipped apt dependencies; using image-provided libraries"
 
       - name: Run end-to-end and responsive checks
         run: npm run test:e2e
