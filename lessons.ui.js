@@ -7,7 +7,9 @@ const LessonsUI = (() => {
   'use strict';
 
   const storageKey = 'fretboard-lab.lessons.v1';
+  const quizStorageKey = 'fretboard-lab.quiz.v1';
   let page;
+  let learned = {};
   let state;
   let level = 'beginner';
   let mounted = false;
@@ -20,24 +22,45 @@ const LessonsUI = (() => {
     return element;
   }
 
-  function loadLevel() {
+  function readPrefs() {
+    let data = null;
     try {
-      const data = JSON.parse(localStorage.getItem(storageKey) || 'null');
-      const saved = data?.version === 1 && data.levels?.[page];
-      if (Lessons.LEVELS.includes(saved)) level = saved;
+      data = JSON.parse(localStorage.getItem(storageKey) || 'null');
     } catch (error) {
       console.warn('Lesson preferences unavailable:', error);
     }
+    if (data?.version !== 1 || typeof data.levels !== 'object' || data.levels === null) data = { version: 1, levels: {} };
+    if (typeof data.learned !== 'object' || data.learned === null) data.learned = {};
+    return data;
   }
 
-  function saveLevel() {
+  function loadLevel() {
+    const data = readPrefs();
+    const saved = data.levels[page];
+    if (Lessons.LEVELS.includes(saved)) level = saved;
+    learned = Object.fromEntries(Lessons.LEVELS.filter(key => data.learned[page]?.[key] === true).map(key => [key, true]));
+  }
+
+  function savePrefs() {
     try {
-      let data = JSON.parse(localStorage.getItem(storageKey) || 'null');
-      if (data?.version !== 1 || typeof data.levels !== 'object' || data.levels === null) data = { version: 1, levels: {} };
+      const data = readPrefs();
       data.levels[page] = level;
+      data.learned[page] = { ...learned };
       localStorage.setItem(storageKey, JSON.stringify(data));
     } catch (error) {
       console.warn('Lesson preferences not saved:', error);
+    }
+  }
+
+  /* Latest Quiz result for this lesson's activity (read-only; Quiz owns its storage). */
+  function quizResult(activity) {
+    try {
+      const data = JSON.parse(localStorage.getItem(quizStorageKey) || 'null');
+      if (data?.version !== 1 || !Array.isArray(data.history)) return null;
+      const item = data.history.findLast(entry => entry?.settings?.activity === activity && Number.isInteger(entry.total) && entry.total > 0);
+      return item ? { correct: item.correct, total: item.total } : null;
+    } catch {
+      return null;
     }
   }
 
@@ -87,7 +110,7 @@ const LessonsUI = (() => {
 
   function select(key, focus) {
     level = key;
-    saveLevel();
+    savePrefs();
     render();
     if (focus) els.buttons[Lessons.LEVELS.indexOf(key)].focus();
   }
@@ -98,6 +121,9 @@ const LessonsUI = (() => {
       const active = button.dataset.level === level;
       button.setAttribute('aria-selected', String(active));
       button.tabIndex = active ? 0 : -1;
+      const done = learned[button.dataset.level] === true;
+      button.classList.toggle('is-learned', done);
+      button.setAttribute('aria-label', `${Lessons.LEVEL_LABELS[button.dataset.level]}${done ? ' (learned)' : ''}`);
     }
     els.panel.setAttribute('aria-labelledby', `lesson-tab-${level}`);
 
@@ -121,7 +147,30 @@ const LessonsUI = (() => {
     link.append(lesson.quiz.label, ' ', node('span', '→'));
     link.lastChild.setAttribute('aria-hidden', 'true');
 
-    els.panel.replaceChildren(header, model, ...sections, link);
+    const footer = node('div', undefined, 'lesson-path');
+    const result = quizResult(lesson.quiz.settings.activity);
+    const score = node('p', undefined, 'lesson-score');
+    score.id = 'lesson-score';
+    score.textContent = result
+      ? `Last ${lesson.quiz.settings.activity} quiz: ${result.correct}/${result.total} first-attempt correct (${Math.round(result.correct / result.total * 100)}%).`
+      : 'No quiz result for this topic yet.';
+    const mark = node('button', undefined, 'lesson-learned');
+    mark.type = 'button';
+    mark.id = 'lesson-learned';
+    const done = learned[level] === true;
+    mark.setAttribute('aria-pressed', String(done));
+    mark.textContent = done ? '✓ Learned — tap to unmark' : 'Mark as learned';
+    mark.addEventListener('click', () => {
+      if (learned[level]) delete learned[level]; else learned[level] = true;
+      savePrefs();
+      render();
+    });
+    const count = Lessons.LEVELS.filter(key => learned[key]).length;
+    const progress = node('p', `${count} of ${Lessons.LEVELS.length} levels learned on this page.`, 'lesson-progress');
+    progress.id = 'lesson-progress';
+    footer.append(link, score, mark, progress);
+
+    els.panel.replaceChildren(header, model, ...sections, footer);
   }
 
   function update(nextPage, nextState) {
