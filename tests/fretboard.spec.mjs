@@ -289,7 +289,9 @@ for (const theme of ['light', 'dark']) {
           expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(13, 17, 23)');
         }
         if (width >= 1280 && (file === 'index' || file === 'modes')) {
-          expect(await page.locator('#fretboard').evaluate(el => el.getBoundingClientRect().top)).toBeLessThan(850);
+          // Settings sit on their own row above the neck; Linux CI fonts
+          // render ~50px taller than macOS, so leave headroom below 900.
+          expect(await page.locator('#fretboard').evaluate(el => el.getBoundingClientRect().top)).toBeLessThan(900);
         }
         const fontSizes = await page.locator('.fb-fretnum, .fb-string-label').evaluateAll(elements => (
           elements.map(el => parseFloat(getComputedStyle(el).fontSize))

@@ -1273,6 +1273,27 @@ code {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
+/* Wide layouts: keep the neck near the fold now that settings sit on their
+   own row. Trim non-text spacing only, so Linux font metrics (taller than
+   macOS in CI) cannot push the fretboard down. */
+@media (min-width: 80rem) {
+  .control-deck {
+    padding: 0.75rem 1rem;
+  }
+
+  .control-deck .section-heading {
+    margin-bottom: 0.75rem;
+  }
+
+  .instrument-stage {
+    margin-top: 0.75rem;
+  }
+
+  .practice-settings .range-ends {
+    display: none;
+  }
+}
+
 .progression-stage {
   margin-top: 1rem;
 }
