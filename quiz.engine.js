@@ -2,9 +2,9 @@
 const QuizEngine = (() => {
   const theory = typeof module !== 'undefined' && module.exports
     ? require('./fretboard.engine.js')
-    : { STRINGS, CHORDS, SCALES, SHARP, FLAT, noteAt, nameFor, spellChord, diatonicChords, scalePrefersFlats };
+    : { STRINGS, CHORDS, SCALES, MODES, MODE_ORDER, SHARP, FLAT, noteAt, nameFor, spellChord, diatonicChords, scalePrefersFlats, modeStepPattern, modeDegree, parentMajorPc, modeCharacteristics, scaleDegreeLabels };
   const defaults = { activity: 'notes', direction: 'name', string: 'all', frets: 5, notes: 'natural', key: 7, scale: 'major', advanced: false };
-  const activities = { notes: 'Fretboard notes', intervals: 'Intervals', chords: 'Chord tones', roman: 'Roman numerals' };
+  const activities = { notes: 'Fretboard notes', intervals: 'Intervals', chords: 'Chord tones', roman: 'Roman numerals', modes: 'Modes' };
   const intervals = ['Unison', 'Minor 2nd', 'Major 2nd', 'Minor 3rd', 'Major 3rd', 'Perfect 4th', 'Tritone', 'Perfect 5th', 'Minor 6th', 'Major 6th', 'Minor 7th', 'Major 7th', 'Octave'];
   const naturalPitches = [0, 2, 4, 5, 7, 9, 11];
   const pitchLabel = pc => theory.SHARP[pc] === theory.FLAT[pc] ? theory.SHARP[pc] : `${theory.SHARP[pc]} / ${theory.FLAT[pc]}`;
@@ -103,6 +103,48 @@ const QuizEngine = (() => {
             explanation: `${names[0]} ${chord.name} is ${names.join(' · ')}. Formula: ${chord.labels.join(' · ')}. ${names[index]} is ${chord.labels[index]}.`,
           });
         });
+      }
+    } else if (s.activity === 'modes') {
+      const modeOptions = theory.MODE_ORDER.map(key => option(key, theory.MODES[key].name));
+      const ordinal = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th'];
+      const degreeLabels = ['♭2', '♭3', '♯4', '♭5', '6', '♭6', '♭7', '7'];
+      for (const modeKey of theory.MODE_ORDER) {
+        const mode = theory.MODES[modeKey];
+        const degree = theory.modeDegree(modeKey);
+        const pattern = theory.modeStepPattern(theory.SCALES[modeKey].steps).join(' ');
+        const correct = option(modeKey, mode.name);
+        questions.push({
+          id: `mode:pattern:${modeKey}`, skill: `Mode pattern: ${mode.name}`,
+          prompt: `Which mode has the step pattern ${pattern}?`,
+          correct, candidates: modeOptions,
+          explanation: `${pattern} is ${mode.name}: it is the major-scale pattern rotated to start on degree ${degree}. W is a whole step (2 frets) and H a half step (1 fret).`,
+        });
+        questions.push({
+          id: `mode:degree:${modeKey}`, skill: `Mode order: ${mode.name}`,
+          prompt: `Which mode starts on the ${ordinal[degree - 1]} degree of the major scale?`,
+          correct, candidates: modeOptions,
+          explanation: `The modes in order are Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian. Degree ${degree} is ${mode.name}.`,
+        });
+        const flats = theory.scalePrefersFlats(s.key, modeKey);
+        const tonic = theory.nameFor(s.key, flats);
+        const parent = theory.parentMajorPc(s.key, modeKey);
+        questions.push({
+          id: `mode:parent:${modeKey}`, skill: `Parent key: ${mode.name}`,
+          prompt: `${tonic} ${mode.name} uses the notes of which major scale?`,
+          correct: option(parent, pitchLabel(parent)), candidates: pitchOptions,
+          explanation: `${tonic} ${mode.name} is degree ${degree} of its parent major scale, so count down ${degree - 1} scale step(s) from ${tonic}: the parent is ${pitchLabel(parent)} major. Same seven notes, new home.`,
+        });
+        const characteristic = theory.modeCharacteristics(modeKey).labels;
+        if (characteristic.length) {
+          const labels = theory.scaleDegreeLabels(theory.SCALES[modeKey]);
+          questions.push({
+            id: `mode:color:${modeKey}`, skill: `Characteristic tone: ${mode.name}`,
+            prompt: `Which scale degree gives ${mode.name} its distinctive color?`,
+            correct: option(characteristic[0], characteristic[0]),
+            candidates: degreeLabels.map(label => option(label, label)),
+            explanation: `${mode.name} spelled against the major scale is ${labels.join(' ')}. The ${characteristic.join(' and ')} is what separates it from the plain ${theory.SCALES[modeKey].family === 'minor' ? 'natural minor' : 'major'} scale.`,
+          });
+        }
       }
     } else {
       const flats = theory.scalePrefersFlats(s.key, s.scale);

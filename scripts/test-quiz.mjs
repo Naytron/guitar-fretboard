@@ -89,3 +89,19 @@ for (const assistAll of [false, true]) {
   assert.equal(quiz.retry(zero).questions.length, 10);
 }
 console.log('PASS contextual spelling across all modes/keys; quiz pools, grading, hints, retry, and deterministic generation');
+
+// Modes activity: 26 questions per tonic, every parent key is correct, no option duplicates.
+for (let key = 0; key < 12; key++) {
+  const modes = quiz.pool({ activity: 'modes', key });
+  assert.equal(modes.length, 26);
+  for (const question of modes.filter(q => q.id.startsWith('mode:parent:'))) {
+    const modeKey = question.id.split(':')[2];
+    assert.equal(Number(question.correct.id), theory.parentMajorPc(key, modeKey));
+  }
+  const session = quiz.start({ activity: 'modes', key }, random);
+  for (const question of session.questions) {
+    assert.equal(new Set(question.options.map(option => option.id)).size, 4);
+    assert.ok(question.options.some(option => option.id === question.correct.id));
+  }
+}
+assert.equal(quiz.pool({ activity: 'modes', key: 0 }).filter(q => q.id.startsWith('mode:color:')).length, 5);

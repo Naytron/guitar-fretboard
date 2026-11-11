@@ -487,8 +487,8 @@ const Lessons = (() => {
             ]],
           },
         ],
-        quiz: () => ({ activity: 'intervals', frets: 5 }),
-        quizLabel: 'Practice intervals in Quiz',
+        quiz: ctx => ({ activity: 'modes', key: ctx.rootPc }),
+        quizLabel: 'Practice mode order and patterns in Quiz',
       },
       intermediate: {
         title: 'The one note that changes everything',
@@ -527,8 +527,8 @@ const Lessons = (() => {
             ].flat()],
           },
         ],
-        quiz: () => ({ activity: 'intervals', frets: 12 }),
-        quizLabel: 'Practice intervals across 12 frets in Quiz',
+        quiz: ctx => ({ activity: 'modes', key: ctx.rootPc }),
+        quizLabel: 'Practice parent keys and characteristic tones in Quiz',
       },
       advanced: {
         title: 'Parallel thinking and modal chords',

@@ -29,7 +29,7 @@ async function finish(page, questions, response = 'correct') {
   }
 }
 
-for (const activity of ['notes', 'intervals', 'chords', 'roman']) {
+for (const activity of ['notes', 'intervals', 'chords', 'roman', 'modes']) {
   test(`${activity} lesson grades ten questions and persists a correct first-attempt score`, async ({ page }) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));

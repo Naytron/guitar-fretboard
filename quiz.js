@@ -75,6 +75,7 @@
       intervals: 'Visual intervals, not ear training. Ascending from an open-string root, frets 0–12: unison through octave. Six semitones is the tritone.',
       chords: 'R means root. Other labels identify the chord interval, such as 3 (major third) or ♭3 (minor third).',
       roman: 'Major and natural-minor triads only. Capitalization and ° are part of the chord quality.',
+      modes: 'Name modes from their W/H pattern and degree, find the parent major key of a mode on your chosen tonic, and spot each mode\'s characteristic tone.',
     };
     $('activity-help').textContent = help[config.activity];
   }
@@ -260,7 +261,9 @@
       const question = session.questions[session.index];
       $('quiz-hint-text').textContent = question.board
         ? 'Each fret is one semitone. Start at the open-string note; E–F and B–C are half steps. Other neighboring natural notes are a whole step apart.'
-        : 'Build from the root using the scale or chord formula. Major triads use 0, 4, 7 semitones; minor triads use 0, 3, 7.';
+        : session.settings.activity === 'modes'
+          ? 'Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian — degrees 1 to 7. The parent major key sits that many scale steps below the tonic.'
+          : 'Build from the root using the scale or chord formula. Major triads use 0, 4, 7 semitones; minor triads use 0, 3, 7.';
       $('quiz-hint').disabled = true;
     });
     $('quiz-reveal').addEventListener('click', () => {
