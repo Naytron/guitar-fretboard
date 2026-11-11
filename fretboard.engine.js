@@ -102,6 +102,34 @@ function scaleDegreeLabels(scale) {
 }
 
 /*
+ * Degree labels relative to the parallel major for ANY scale or chord formula,
+ * keyed by semitone offset from the root. Seven-note scales keep their proper
+ * degree spelling (Lydian ♯4, Locrian ♭5); everything else falls back to the
+ * conventional label for each semitone (6 → ♭5). `altered` marks degrees that
+ * differ from the major scale; `magnitude` is the size of that difference.
+ */
+const SEMITONE_DEGREE_LABELS = ['1', '♭2', '2', '♭3', '3', '4', '♭5', '5', '♭6', '6', '♭7', '7'];
+
+function degreeLabelsFor(scale) {
+  const majorSteps = SCALES.major.steps;
+  const labelled = scale.steps.length === 7
+    ? scaleDegreeLabels(scale).map((label, index) => ({ step: scale.steps[index], label }))
+    : scale.steps.map((step) => ({ step, label: SEMITONE_DEGREE_LABELS[step] }));
+  return labelled.map(({ step, label }) => {
+    const degree = Number(label.replace(/[♭♯]/g, '')) - 1;
+    const difference = step - majorSteps[degree];
+    return {
+      step,
+      label,
+      degree: degree + 1,
+      altered: difference !== 0,
+      direction: difference < 0 ? 'flat' : difference > 0 ? 'sharp' : null,
+      magnitude: Math.abs(difference),
+    };
+  });
+}
+
+/*
  * The tones that separate a mode from the plain major or natural-minor scale
  * of its family. Ionian and Aeolian return [] because they ARE the references.
  */
@@ -353,7 +381,7 @@ function runChordSelfTest() {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SHARP, FLAT, STRINGS, SCALES, CHORDS, MODES, MODE_ORDER, MODE_BRIGHTNESS, modeStepPattern,
-    modeDegree, parentMajorPc, scaleDegreeLabels, modeCharacteristics,
+    modeDegree, parentMajorPc, scaleDegreeLabels, degreeLabelsFor, modeCharacteristics,
     keyPrefersFlats, nameFor, spellChord, spellScale, scalePrefersFlats, diatonicChords, scaleSet, noteAt,
     intervalCategory, chordIntervals, runSelfTest, runChordSelfTest,
   };

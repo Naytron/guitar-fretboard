@@ -9,13 +9,33 @@ import './test-lessons.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
-const { CHORDS, MODES, SCALES, modeStepPattern, runChordSelfTest, runSelfTest } = require(resolve(root, 'fretboard.engine.js'));
+const { CHORDS, MODES, SCALES, degreeLabelsFor, modeStepPattern, runChordSelfTest, runSelfTest } = require(resolve(root, 'fretboard.engine.js'));
 const patterns = ['WWHWWWH', 'WHWWWHW', 'HWWWHWW', 'WWWHWWH', 'WWHWWHW', 'WHWWHWW', 'HWWHWWW'];
 Object.keys(MODES).forEach((key, index) => {
   const pattern = modeStepPattern(SCALES[key].steps);
   assert.equal(pattern.join(''), patterns[index], `${key} modal pattern including octave return`);
   assert.equal(pattern.reduce((total, step) => total + (step === 'W' ? 2 : 1), 0), 12);
 });
+const degreeCases = {
+  major: ['1', '2', '3', '4', '5', '6', '7'],
+  lydian: ['1', '2', '3', '♯4', '5', '6', '7'],
+  dorian: ['1', '2', '♭3', '4', '5', '6', '♭7'],
+  locrian: ['1', '♭2', '♭3', '4', '♭5', '♭6', '♭7'],
+  minor_pentatonic: ['1', '♭3', '4', '5', '♭7'],
+  blues: ['1', '♭3', '4', '♭5', '5', '♭7'],
+  dom7: ['1', '3', '5', '♭7'],
+};
+Object.entries(degreeCases).forEach(([key, want]) => {
+  const degrees = degreeLabelsFor(SCALES[key]);
+  assert.deepEqual(degrees.map((degree) => degree.label), want, `${key} degree labels`);
+  degrees.forEach((degree) => {
+    assert.equal(degree.altered, /[♭♯]/.test(degree.label), `${key} ${degree.label} altered flag`);
+    assert.equal(degree.direction, degree.label.includes('♭') ? 'flat' : degree.label.includes('♯') ? 'sharp' : null);
+    assert.equal(degree.magnitude, (degree.label.match(/[♭♯]/g) || []).length);
+  });
+});
+assert.equal(degreeLabelsFor(SCALES.lydian)[3].step, 6, 'Lydian ♯4 sits six semitones above the root');
+assert.equal(degreeLabelsFor(SCALES.chromatic).filter((degree) => degree.altered).length, 5);
 const suites = [
   ['note engine', runSelfTest()],
   ['chord engine', runChordSelfTest()],

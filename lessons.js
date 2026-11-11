@@ -13,14 +13,13 @@ const Lessons = (() => {
     ? require('./fretboard.engine.js')
     : {
       STRINGS, SCALES, CHORDS, MODES, MODE_ORDER, MODE_BRIGHTNESS, modeDegree, parentMajorPc,
-      scaleDegreeLabels, modeCharacteristics, modeStepPattern, nameFor, spellChord, spellScale,
+      scaleDegreeLabels, degreeLabelsFor, modeCharacteristics, modeStepPattern, nameFor, spellChord, spellScale,
       scalePrefersFlats, diatonicChords, noteAt,
     };
 
   const LEVELS = ['beginner', 'intermediate', 'advanced'];
   const LEVEL_LABELS = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
   const PAGES = ['scales', 'chords', 'progressions', 'modes'];
-  const SEMITONE_LABELS = ['1', '♭2', '2', '♭3', '3', '4', '♭5', '5', '♭6', '6', '♭7', '7'];
   const FUNCTIONS = ['Tonic (home)', 'Pre-dominant', 'Tonic substitute', 'Subdominant (away)', 'Dominant (tension)', 'Relative tonic', 'Leading-tone dominant'];
   const MODE_SHORT = { major: 'Ionian', dorian: 'Dorian', phrygian: 'Phrygian', lydian: 'Lydian', mixolydian: 'Mixolydian', natural_minor: 'Aeolian', locrian: 'Locrian' };
 
@@ -42,7 +41,7 @@ const Lessons = (() => {
     const flats = typeof state.flats === 'boolean' ? state.flats : theory.scalePrefersFlats(rootPc, scaleKey);
     const rootName = theory.nameFor(rootPc, flats);
     const notes = theory.spellScale(rootPc, scale, flats);
-    const degrees = scale.steps.length === 7 ? theory.scaleDegreeLabels(scale) : scale.steps.map(step => SEMITONE_LABELS[step]);
+    const degrees = theory.degreeLabelsFor(scale).map(degree => degree.label);
     const frets = scale.steps.map((step, index) => (scale.steps[index + 1] ?? 12) - step);
     const ctx = { page, rootPc, rootName, flats, scaleKey, scale, scaleName: scale.name, notes, degrees, frets, tonicName: notes[0] };
 
