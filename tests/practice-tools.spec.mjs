@@ -79,7 +79,7 @@ test.describe('audio playback', () => {
 
 test.describe('parallel-major comparison', () => {
   test('marks altered degrees and parallel-only notes for Dorian', async ({ page }) => {
-    await page.goto('/modes.html?key=2&mode=dorian');
+    await page.goto('/modes.html?key=2&mode=dorian&labels=notes');
     await expect(page.locator('.note.altered')).toHaveCount(0);
     await expect(page.locator('.compare-key').first()).toBeHidden();
     await page.locator('#compare-major').check({ force: true });
@@ -103,10 +103,49 @@ test.describe('parallel-major comparison', () => {
 });
 
 test.describe('scale-degree labels', () => {
+  for (const width of [375, 768, 1280, 1920]) {
+    for (const file of ['index', 'modes']) {
+      test(`switching labels preserves the ${file} layout at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(`/${file}.html?key=4&${file === 'modes' ? 'mode' : 'scale'}=lydian&labels=notes`);
+        await page.locator('.practice-settings').evaluate(element => { element.open = true; });
+        const layout = () => page.evaluate(() => {
+          const selectors = [
+            '.instrument-stage', '.instrument-stage .stage-header', '.readout',
+            '.stage-tools', '#label-mode', '.legend', '#fretboard',
+            '.fb-cell', '.note.root', '.stage-footer',
+          ];
+          return selectors.map(selector => {
+            const rect = document.querySelector(selector).getBoundingClientRect();
+            return { selector, x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height };
+          });
+        });
+        const notesLayout = await layout();
+        await page.screenshot({ path: test.info().outputPath('note-labels.png'), fullPage: true });
+
+        await page.locator('#label-mode').selectOption('intervals');
+        await expect(page.locator('.note.degree-sharp').first()).toHaveText('♯4');
+        expect(await layout()).toEqual(notesLayout);
+        await page.screenshot({ path: test.info().outputPath('degree-labels.png'), fullPage: true });
+
+        await page.locator('#label-mode').selectOption('both');
+        await expect(page.locator('.note.degree-sharp').first()).toHaveText('A♯♯4');
+        await expect(page.locator('.note.degree-sharp small').first()).toHaveText('♯4');
+        expect(await layout()).toEqual(notesLayout);
+        await page.screenshot({ path: test.info().outputPath('both-labels.png'), fullPage: true });
+
+        await page.locator('#label-mode').selectOption('notes');
+        await expect(page.locator('.note.root').first()).toHaveText('E');
+        expect(await layout()).toEqual(notesLayout);
+      });
+    }
+  }
+
   test('shows major-relative degrees with the root still marked, and restores from the URL', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('/modes.html?key=4&mode=lydian&labels=degrees');
-    await expect(page.locator('#label-mode')).toHaveValue('degrees');
+    await expect(page.locator('#label-mode')).toHaveValue('intervals');
+    expect(new URL(page.url()).searchParams.get('labels')).toBe('intervals');
     await expect(page.locator('#scale-degrees')).toBeVisible();
     await expect(page.locator('#scale-degrees')).toHaveText('123♯4567');
     await expect(page.locator('#scale-degrees .degree-sharp')).toHaveText('♯4');
@@ -115,7 +154,7 @@ test.describe('scale-degree labels', () => {
     expect(new Set(await roots.allTextContents())).toEqual(new Set(['1']));
     const sharpened = page.locator('.note.degree-sharp');
     expect(new Set(await sharpened.allTextContents())).toEqual(new Set(['♯4']));
-    await expect(sharpened.first()).toHaveAttribute('title', 'A♯');
+    await expect(sharpened.first()).toHaveAttribute('title', 'A♯ — ♯4');
     await expect(page.locator('.note.degree-flat')).toHaveCount(0);
     await expect(page.locator('.degree-key').first()).toBeVisible();
 
@@ -124,18 +163,68 @@ test.describe('scale-degree labels', () => {
     await expect(page.locator('.degree-key').first()).toBeHidden();
     await expect(page.locator('.note.degree-sharp')).toHaveCount(0);
     expect(new Set(await roots.allTextContents())).toEqual(new Set(['E']));
-    expect(new URL(page.url()).searchParams.has('labels')).toBe(false);
+    expect(new URL(page.url()).searchParams.get('labels')).toBe('notes');
     expect(errors).toEqual([]);
   });
 
   test('labels non-heptatonic scales by semitone and ignores invalid label modes', async ({ page }) => {
-    await page.goto('/index.html?key=9&scale=blues&labels=degrees');
+    await page.goto('/index.html?key=9&scale=blues&labels=intervals');
     await expect(page.locator('#scale-degrees')).toHaveText('1♭34♭55♭7');
     const flats = new Set(await page.locator('.note.degree-flat').allTextContents());
     expect(flats).toEqual(new Set(['♭3', '♭5', '♭7']));
-    await page.goto('/index.html?labels=both');
-    await expect(page.locator('#label-mode')).toHaveValue('notes');
-    await expect(page.locator('#scale-degrees')).toBeHidden();
+    await page.goto('/index.html?labels=invalid');
+    await expect(page.locator('#label-mode')).toHaveValue('both');
+    expect(new URL(page.url()).searchParams.has('labels')).toBe(false);
+  });
+
+  for (const file of ['index', 'modes']) {
+    test(`${file} matches the progression label choices and renders stacked notes and intervals`, async ({ page }) => {
+      await page.goto('/progressions.html');
+      const choices = await page.locator('#label-mode option').allTextContents();
+      const cardMarkup = await page.locator('.control').filter({ has: page.locator('#label-mode') }).innerHTML();
+      await page.goto(`/${file}.html?key=4&${file === 'modes' ? 'mode' : 'scale'}=lydian`);
+      await page.locator('.practice-settings').evaluate(element => { element.open = true; });
+      await expect(page.locator('.practice-settings .settings-controls > .control > #label-mode')).toHaveCount(1);
+      expect(await page.locator('.control').filter({ has: page.locator('#label-mode') }).innerHTML()).toBe(cardMarkup);
+      await expect(page.locator('.instrument-stage #label-mode')).toHaveCount(0);
+      await expect(page.getByLabel('Dot labels')).toHaveValue('both');
+      await expect(page.locator('#label-mode option')).toHaveText(choices);
+      await expect(page.locator('.note.root').first()).toHaveText('E1');
+      await expect(page.locator('.note.root small').first()).toHaveText('1');
+      await expect(page.locator('.note.degree-sharp').first()).toHaveText('A♯♯4');
+      await expect(page.locator('.note.degree-sharp').first()).toHaveAttribute('title', 'A♯ — ♯4');
+      await expect(page.locator('.note.degree-sharp').first()).toHaveAttribute('aria-label', /String \d, fret \d+: A♯, ♯4/);
+
+      await page.locator('#label-mode').selectOption('intervals');
+      await page.locator('#show-all').check({ force: true });
+      await expect(page.locator('.note small')).toHaveCount(0);
+      const outside = page.locator('.note.ghost');
+      expect(await outside.count()).toBeGreaterThan(0);
+      for (const text of await outside.allTextContents()) expect(text).toMatch(/^[♭♯]*[1-7]$/);
+      expect(new URL(page.url()).searchParams.get('labels')).toBe('intervals');
+      await page.reload();
+      await expect(page.getByLabel('Dot labels')).toHaveValue('intervals');
+
+      await page.locator('#label-mode').selectOption('both');
+      await expect(page.locator('.note.ghost small').first()).toBeVisible();
+      await page.reload();
+      await expect(page.locator('.note.root').first()).toHaveText('E1');
+      expect(new URL(page.url()).searchParams.has('labels')).toBe(false);
+
+      await page.locator('#label-mode').selectOption('notes');
+      await expect(page.locator('.note.root').first()).toHaveText('E');
+      await expect(page.locator('.note small')).toHaveCount(0);
+      await expect(page.locator('.note.degree-sharp')).toHaveCount(0);
+      await page.reload();
+      await expect(page.getByLabel('Dot labels')).toHaveValue('notes');
+    });
+  }
+
+  test('comparison-only dots use the selected interval label format', async ({ page }) => {
+    await page.goto('/modes.html?key=2&mode=dorian&compare=true&labels=intervals');
+    expect(new Set(await page.locator('.note.parallel').allTextContents())).toEqual(new Set(['3', '7']));
+    await page.locator('#label-mode').selectOption('both');
+    expect(new Set(await page.locator('.note.parallel').allTextContents())).toEqual(new Set(['F♯3', 'C♯7']));
   });
 
   test('chord necks mark lowered and raised intervals the same way', async ({ page }) => {
@@ -152,7 +241,7 @@ test.describe('scale-degree labels', () => {
 
 test.describe('position filter', () => {
   test('dims notes outside a five-fret window anchored on the low-E root', async ({ page }) => {
-    await page.goto('/index.html?key=7&pos=1');
+    await page.goto('/index.html?key=7&pos=1&labels=notes');
     const inPosition = await page.locator('.note:not(.out-of-position)').count();
     const outOfPosition = await page.locator('.note.out-of-position').count();
     expect(inPosition).toBeGreaterThan(0);

@@ -201,6 +201,7 @@ test('seven-note scale spelling is consistent in Scales, Modes and Progressions'
       await expect(page.locator('.diatonic-name').nth(2)).toHaveText('E♯ Minor');
       await expect(page.locator('.diatonic-name').nth(6)).toHaveText('B♯ Diminished');
     } else {
+      await page.locator('#label-mode').selectOption('notes');
       await expect(page.locator('#scale-notes')).toHaveText('C♯ · D♯ · E♯ · F♯ · G♯ · A♯ · B♯');
       await expect(page.locator('#fretboard .note').filter({ hasText: /^E♯$/ }).first()).toBeVisible();
     }

@@ -96,6 +96,14 @@
                 <span class="toggle-copy"><strong>Compare with major</strong><small>Mark altered degrees</small></span>
               </label>
             </div>
+            <div class="control">
+              <label for="label-mode"><span class="control-label">Dot labels</span><span class="control-help">Notes, intervals, or both</span></label>
+              <select id="label-mode">
+                <option value="notes">Note names</option>
+                <option value="intervals">Intervals</option>
+                <option value="both" selected>Both</option>
+              </select>
+            </div>
           </div>
         </details>
       </div>
@@ -112,13 +120,6 @@
           <p id="compare-summary" class="compare-summary" aria-live="polite" hidden></p>
         </div>
         <div class="stage-tools">
-          <label class="label-switch" for="label-mode">
-            <span>Labels</span>
-            <select id="label-mode">
-              <option value="notes" selected>Note names</option>
-              <option value="degrees">Scale degrees</option>
-            </select>
-          </label>
           <div class="legend" aria-label="Fretboard legend">
             <span class="key"><span class="swatch root"></span> Tonic</span>
             <span class="key"><span class="swatch in-scale"></span> Mode tone</span>

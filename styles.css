@@ -698,6 +698,12 @@ code {
   display: none;
 }
 
+/* Reserve label-specific content so switching labels never moves the neck. */
+.legend .degree-key[hidden] {
+  display: inline-flex;
+  visibility: hidden;
+}
+
 .swatch {
   display: inline-block;
   width: 0.7rem;
@@ -1253,8 +1259,7 @@ code {
   grid-column: 1 / -1;
 }
 
-.progression-controls .settings-controls,
-.scale-controls .settings-controls {
+.progression-controls .settings-controls {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
@@ -1269,8 +1274,12 @@ code {
   grid-column: 1 / -1;
 }
 
-.mode-controls .settings-controls {
+.scale-controls .settings-controls {
   grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mode-controls .settings-controls {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 /* Wide layouts: keep the neck near the fold now that settings sit on their
@@ -1413,9 +1422,13 @@ code {
   box-shadow: 0 0 0 2px var(--cp-accent-soft);
 }
 
+.scale-grid .note,
 .note.dot-both {
   min-width: 2.5rem;
   height: 2.5rem;
+}
+
+.note.dot-both {
   flex-direction: column;
   gap: 0;
   line-height: 1.1;
@@ -1818,6 +1831,10 @@ code {
     gap: 0.5rem;
   }
 
+  .instrument-stage .readout-row {
+    row-gap: 0.5rem;
+  }
+
   .instrument-stage {
     margin-top: 0.75rem;
   }
@@ -1981,7 +1998,8 @@ code {
 }
 
 .scale-degrees[hidden] {
-  display: none;
+  display: flex;
+  visibility: hidden;
 }
 
 .scale-degrees span {
@@ -1995,21 +2013,6 @@ code {
 
 .scale-degrees .degree-sharp {
   color: var(--cp-degree-sharp);
-}
-
-.label-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--cp-text-muted);
-  font-size: 0.8125rem;
-}
-
-.label-switch select {
-  width: auto;
-  min-height: 2.75rem;
-  padding: 0.25rem 1.75rem 0.25rem 0.6rem;
-  font-size: 0.8125rem;
 }
 
 .compare-summary {

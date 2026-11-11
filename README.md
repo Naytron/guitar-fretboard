@@ -191,12 +191,16 @@ characteristic tone(s). Clicking a chip selects that mode and tonic; the sentenc
 - **Compare with parallel major** (Modes). Marks degrees lowered or raised relative to the major
   scale on the same tonic (amber), ghosts the notes that exist only in the parallel major (dashed),
   and summarises the difference ("♭3 = F ♭7 = C — 2 degrees lowered").
-- **Scale-degree labels** (Scales, Modes). The **Labels** switch beside the legend swaps note
-  names for degrees relative to the parallel major: E Lydian reads `1 2 3 ♯4 5 6 7`, the root
+- **Dot labels** (Scales, Modes). Like Chords and Progressions, the **Dot labels** card in
+  **Neck and display settings** offers
+  **Note names**, **Intervals**, or **Both** (the default, with the note above its interval).
+  Intervals are relative to the parallel major: E Lydian reads `1 2 3 ♯4 5 6 7`, the root
   still reads `1` in the root colour, lowered degrees get a purple ring and raised degrees a pink
   ring (hover a dot for its note name). Seven-note scales use proper degree spelling (`♯4`, `♭5`);
   pentatonic, blues, and chord formulas label each semitone conventionally. Chord necks in
-  interval mode mark `♭`/`♯` intervals with the same rings. URL parameter: `labels=degrees`.
+  interval mode mark `♭`/`♯` intervals with the same rings. Switching labels keeps the readout,
+  legend, and fretboard in place. Outside-scale dots use conventional semitone intervals.
+  URL parameter: `labels=notes|intervals|both`; older `labels=degrees` links still open Intervals.
 - **Position filter** (Scales, Modes). Choose Whole neck or Positions 1–5: a five-fret window
   anchored on the low-E root in CAGED order dims every other note so you can learn one shape
   at a time.

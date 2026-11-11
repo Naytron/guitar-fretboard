@@ -60,8 +60,12 @@
     const inScale = scaleSet(rootPc, def.steps);
     const compare = Boolean(els.compare?.checked);
     const inMajor = compare ? scaleSet(rootPc, SCALES.major.steps) : null;
-    const showDegrees = els.labelMode?.value === 'degrees';
-    const degrees = new Map(degreeLabelsFor(def).map((degree) => [(rootPc + degree.step) % 12, degree]));
+    const labelMode = els.labelMode.value;
+    const showDegrees = labelMode !== 'notes';
+    const degrees = new Map(
+      [...degreeLabelsFor(SCALES.chromatic), ...degreeLabelsFor(def)]
+        .map((degree) => [(rootPc + degree.step) % 12, degree])
+    );
     document.querySelectorAll('.degree-key').forEach((key) => { key.hidden = !showDegrees; });
     if (modesPage) renderComparison(rootPc, scaleKey, flats, compare);
 
@@ -115,7 +119,7 @@
 
     // Grid: 1 label column + (fretCount + 1) fret columns (0..N)
     const grid = document.createElement('div');
-    grid.className = 'fb-grid';
+    grid.className = 'fb-grid scale-grid';
     grid.style.setProperty('--fret-count', String(fretCount + 1));
     grid.style.gridTemplateColumns = `var(--label-col) repeat(${fretCount + 1}, 1fr)`;
 
@@ -153,13 +157,19 @@
           else dot.classList.add('ghost');
           if (compare && isIn && !isRoot && !inMajor.has(pc)) dot.classList.add('altered');
           const degree = degrees.get(pc);
-          if (showDegrees && isIn) {
-            dot.textContent = degree.label;
-            dot.title = noteNames.get(pc);
-            if (degree.altered) dot.classList.add(`degree-${degree.direction}`, degree.magnitude > 1 ? 'degree-double' : 'degree-single');
-          } else {
-            dot.textContent = isIn ? noteNames.get(pc) : nameFor(pc, flats);
+          const name = isIn ? noteNames.get(pc) : nameFor(pc, flats);
+          dot.textContent = labelMode === 'intervals' ? degree.label : name;
+          if (showDegrees && isIn && degree.altered) {
+            dot.classList.add(`degree-${degree.direction}`, degree.magnitude > 1 ? 'degree-double' : 'degree-single');
           }
+          if (labelMode === 'both') {
+            dot.classList.add('dot-both');
+            const interval = document.createElement('small');
+            interval.textContent = degree.label;
+            dot.appendChild(interval);
+          }
+          dot.title = `${name} — ${degree.label}`;
+          dot.setAttribute('aria-label', `String ${6 - i}, fret ${f}: ${name}, ${degree.label}`);
           c.appendChild(dot);
         }
         grid.appendChild(c);
@@ -298,6 +308,12 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
+    // Preserve bookmarks created before scale degrees were named "Intervals".
+    const url = new URL(location.href);
+    if (url.searchParams.get('labels') === 'degrees') {
+      url.searchParams.set('labels', 'intervals');
+      history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+    }
     PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll, compare: els.compare, pos: els.position, labels: els.labelMode });
     PageState.wireShare();
     $('play-controls')?.append(Playback.button(modesPage ? 'Play mode' : 'Play scale', (done) =>
