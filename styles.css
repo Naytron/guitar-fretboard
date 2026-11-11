@@ -1903,3 +1903,160 @@ code {
   font-weight: 650;
   font-variant-numeric: tabular-nums;
 }
+
+/* --------------------------------------------------------------------------
+   Print: a clean handout — diagram, legend, pattern/mode strip and the active
+   lesson. Chrome, controls and interactive buttons are removed.
+   -------------------------------------------------------------------------- */
+@media print {
+  :root,
+  [data-theme="dark"] {
+    --cp-bg: #ffffff;
+    --cp-bg-elevated: #ffffff;
+    --cp-surface: #ffffff;
+    --cp-surface-soft: #f3f3f3;
+    --cp-border: #bbbbbb;
+    --cp-border-strong: #555555;
+    --cp-text: #111111;
+    --cp-text-muted: #444444;
+    --cp-text-soft: #555555;
+    --cp-accent: #8a1538;
+    --cp-accent-soft: rgba(138, 21, 56, 0.12);
+    --cp-accent-fg: #ffffff;
+    --cp-shadow: none;
+    --fret-min-width: 0;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  .topbar,
+  .site-nav,
+  .hero,
+  .control-deck,
+  .controls,
+  .practice-settings,
+  .stage-footer,
+  .share-row,
+  .play-controls,
+  .play-button,
+  .scroll-hint,
+  .shell-topline,
+  .site-footer,
+  .lesson-tabs,
+  .lesson-quiz,
+  .lesson-learned,
+  .hero-action,
+  #quiz-settings,
+  #quiz-history,
+  .quiz-actions,
+  dialog {
+    display: none !important;
+  }
+
+  .site-header {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  main,
+  .workspace,
+  .instrument-stage,
+  .lesson-panel,
+  .mode-order-panel {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+  }
+
+  .instrument-stage,
+  .lesson-panel,
+  .mode-order-panel,
+  .fretboard-shell,
+  .fb-grid {
+    border-color: #bbb;
+    background: #fff !important;
+  }
+
+  .instrument-stage {
+    margin-top: 0;
+  }
+
+  .mode-order-panel,
+  .lesson-panel {
+    margin-top: 6mm;
+  }
+
+  .fretboard-shell,
+  .mode-pattern-panel,
+  .mode-order-panel,
+  .lesson-model,
+  .lesson-section {
+    break-inside: avoid;
+  }
+
+  .fretboard {
+    overflow: visible;
+    padding: 2mm;
+  }
+
+  .fb-grid {
+    min-width: 0;
+    width: 100%;
+    font-size: 0.72rem;
+  }
+
+  .fb-cell,
+  .fb-fretnum,
+  .fb-string-label {
+    min-width: 0;
+  }
+
+  .note {
+    width: 1.55em;
+    height: 1.55em;
+    font-size: 0.68rem;
+    border: 1px solid #555;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .note.ghost,
+  .note.out-of-position {
+    opacity: 0.45;
+  }
+
+  .swatch,
+  .mode-chip,
+  .compare-chip,
+  .lesson-model {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .lesson-panel [role="tabpanel"] {
+    max-width: none;
+  }
+
+  .lesson-path {
+    border: 0;
+    padding: 0;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+}

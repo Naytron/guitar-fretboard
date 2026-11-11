@@ -272,3 +272,24 @@
   outline: 2px solid var(--cp-accent);
   outline-offset: 2px;
 }
+
+@media print {
+  .mode-strip-scroll {
+    overflow: visible;
+  }
+
+  .mode-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 3mm;
+    min-width: 0;
+  }
+
+  .mode-chip {
+    min-width: 0;
+    break-inside: avoid;
+  }
+
+  .mode-details {
+    display: none;
+  }
+}
