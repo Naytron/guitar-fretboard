@@ -95,22 +95,28 @@ jobs:
             echo "Azure reports $actual_version instead of $EXPECTED_VERSION." >&2
             exit 1
           fi
-          curl --fail --silent --show-error --location "${site_url}/index.html" |
-            grep --fixed-strings --quiet 'id="selftest"'
-          curl --fail --silent --show-error --location "${site_url}/chords.html" |
-            grep --fixed-strings --quiet 'id="selftest"'
-          curl --fail --silent --show-error --location "${site_url}/progressions.html" |
-            grep --fixed-strings --quiet 'id="selftest"'
-          curl --fail --silent --show-error --location "${site_url}/modes.html" |
-            grep --fixed-strings --quiet 'id="mode-pattern"'
-          curl --fail --silent --show-error --location "${site_url}/quiz.html" |
-            grep --fixed-strings --quiet 'id="quiz-session"'
-          curl --fail --silent --show-error --location "${site_url}/quiz.engine.js" |
-            grep --fixed-strings --quiet 'const QuizEngine'
-          curl --fail --silent --show-error --location "${site_url}/modes.html" |
-            grep --fixed-strings --quiet 'id="mode-strip"'
-          curl --fail --silent --show-error --location "${site_url}/lessons.js" |
-            grep --fixed-strings --quiet 'const Lessons'
+          # Download first, then grep: piping into `grep --quiet` can close the
+          # pipe early and make curl exit 23 under `pipefail`.
+          expect_marker() {
+            local path="$1" marker="$2"
+            curl --fail --silent --show-error --location --output smoke-body "${site_url}/${path}"
+            if ! grep --fixed-strings --quiet "$marker" smoke-body; then
+              echo "${path} is missing expected marker: ${marker}" >&2
+              exit 1
+            fi
+          }
+          expect_marker index.html 'id="selftest"'
+          expect_marker chords.html 'id="selftest"'
+          expect_marker progressions.html 'id="selftest"'
+          expect_marker modes.html 'id="mode-pattern"'
+          expect_marker modes.html 'id="mode-strip"'
+          expect_marker modes.html 'id="compare-major"'
+          expect_marker quiz.html 'id="quiz-session"'
+          expect_marker quiz.engine.js 'const QuizEngine'
+          expect_marker lessons.js 'const Lessons'
+          expect_marker page-state.js 'const PageState'
+          expect_marker playback.js 'const Playback'
+          rm -f smoke-body
 
       - name: Summarize deployment
         shell: bash
