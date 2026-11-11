@@ -45,6 +45,7 @@ const JavaScriptFiles = [
   'quiz.js',
   'lessons.js',
   'lessons.ui.js',
+  'page-state.js',
   'practice-layout.js',
   'scripts/test-quiz.mjs',
   'scripts/test-lessons.mjs',

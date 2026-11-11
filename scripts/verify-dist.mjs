@@ -16,6 +16,7 @@ const expectedFiles = [
   'lessons.js',
   'lessons.ui.js',
   'modes.html',
+  'page-state.js',
   'practice-layout.js',
   'progressions.html',
   'progressions.js',

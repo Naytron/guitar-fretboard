@@ -101,6 +101,7 @@
     if (typeof LessonsUI !== 'undefined') {
       LessonsUI.update('chords', { rootPc, flats: useFlatsFor(rootPc, 'major') });
     }
+    PageState.sync();
   }
 
   /* ---- Wire up ---- */
@@ -124,6 +125,8 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
+    PageState.bind({ key: els.root, frets: els.frets, spelling: els.spelling, labels: els.labelMode });
+    PageState.wireShare();
     wire();
     render();
     showSelfTest();

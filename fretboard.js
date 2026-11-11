@@ -136,6 +136,7 @@
     }
 
     els.board.replaceChildren(grid);
+    PageState.sync();
   }
 
   function cell(cls, text) {
@@ -222,6 +223,8 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
+    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll });
+    PageState.wireShare();
     wire();
     render();
     showSelfTest();

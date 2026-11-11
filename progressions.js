@@ -86,6 +86,7 @@
     if (typeof LessonsUI !== 'undefined') {
       LessonsUI.update('progressions', { rootPc, scaleKey: els.scale.value, flats, pattern: progressionSteps() });
     }
+    PageState.sync();
   }
 
   function populate() {
@@ -107,6 +108,8 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
+    PageState.bind({ key: els.root, scale: els.scale, spelling: els.spelling, chords: els.chordType, progression: els.progression, frets: els.frets, labels: els.labelMode });
+    PageState.wireShare();
     [els.root, els.scale, els.spelling, els.chordType, els.progression, els.frets, els.labelMode].forEach((control) => {
       control.addEventListener('change', render);
     });

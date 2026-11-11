@@ -26,6 +26,7 @@ const publicFiles = [
   'lessons.css',
   'lessons.js',
   'lessons.ui.js',
+  'page-state.js',
   'practice-layout.js',
   'les-paul.svg',
   'styles.css',
