@@ -102,6 +102,54 @@ test.describe('parallel-major comparison', () => {
   });
 });
 
+test.describe('scale-degree labels', () => {
+  test('shows major-relative degrees with the root still marked, and restores from the URL', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.goto('/modes.html?key=4&mode=lydian&labels=degrees');
+    await expect(page.locator('#label-mode')).toHaveValue('degrees');
+    await expect(page.locator('#scale-degrees')).toBeVisible();
+    await expect(page.locator('#scale-degrees')).toHaveText('123♯4567');
+    await expect(page.locator('#scale-degrees .degree-sharp')).toHaveText('♯4');
+    await expect(page.locator('#scale-notes')).toHaveText(/^E/);
+    const roots = page.locator('.note.root');
+    expect(new Set(await roots.allTextContents())).toEqual(new Set(['1']));
+    const sharpened = page.locator('.note.degree-sharp');
+    expect(new Set(await sharpened.allTextContents())).toEqual(new Set(['♯4']));
+    await expect(sharpened.first()).toHaveAttribute('title', 'A♯');
+    await expect(page.locator('.note.degree-flat')).toHaveCount(0);
+    await expect(page.locator('.degree-key').first()).toBeVisible();
+
+    await page.locator('#label-mode').selectOption('notes');
+    await expect(page.locator('#scale-degrees')).toBeHidden();
+    await expect(page.locator('.degree-key').first()).toBeHidden();
+    await expect(page.locator('.note.degree-sharp')).toHaveCount(0);
+    expect(new Set(await roots.allTextContents())).toEqual(new Set(['E']));
+    expect(new URL(page.url()).searchParams.has('labels')).toBe(false);
+    expect(errors).toEqual([]);
+  });
+
+  test('labels non-heptatonic scales by semitone and ignores invalid label modes', async ({ page }) => {
+    await page.goto('/index.html?key=9&scale=blues&labels=degrees');
+    await expect(page.locator('#scale-degrees')).toHaveText('1♭34♭55♭7');
+    const flats = new Set(await page.locator('.note.degree-flat').allTextContents());
+    expect(flats).toEqual(new Set(['♭3', '♭5', '♭7']));
+    await page.goto('/index.html?labels=both');
+    await expect(page.locator('#label-mode')).toHaveValue('notes');
+    await expect(page.locator('#scale-degrees')).toBeHidden();
+  });
+
+  test('chord necks mark lowered and raised intervals the same way', async ({ page }) => {
+    await page.goto('/chords.html?key=0&labels=intervals');
+    const flats = new Set(await page.locator('.note.degree-flat').allTextContents());
+    expect(flats.has('♭3')).toBe(true);
+    expect(flats.has('♭7')).toBe(true);
+    const sharps = new Set(await page.locator('.note.degree-sharp').allTextContents());
+    expect(sharps.has('♯5')).toBe(true);
+    await page.goto('/chords.html?key=0&labels=notes');
+    await expect(page.locator('.note.degree-flat')).toHaveCount(0);
+  });
+});
+
 test.describe('position filter', () => {
   test('dims notes outside a five-fret window anchored on the low-E root', async ({ page }) => {
     await page.goto('/index.html?key=7&pos=1');

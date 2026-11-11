@@ -39,6 +39,9 @@ function renderChordFretboard(rootPc, chord, notes, fretCount, labelMode) {
         dot.className = `note cat-${intervalCategory(interval)}`;
         if (interval === 'R') dot.classList.add('is-root');
         dot.textContent = labelMode === 'intervals' ? interval : name;
+        if (labelMode !== 'notes' && /[♭♯]/.test(interval)) {
+          dot.classList.add(interval.includes('♭') ? 'degree-flat' : 'degree-sharp');
+        }
         if (labelMode === 'both') {
           dot.classList.add('dot-both');
           const label = document.createElement('small');

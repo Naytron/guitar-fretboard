@@ -142,11 +142,23 @@
             <p id="scale-notes" class="scale-notes"></p>
             <div id="play-controls" class="play-controls"></div>
           </div>
+          <p id="scale-degrees" class="scale-degrees" hidden></p>
         </div>
-        <div class="legend" aria-label="Fretboard legend">
-          <span class="key"><span class="swatch root"></span> Root</span>
-          <span class="key"><span class="swatch in-scale"></span> Scale tone</span>
-          <span class="key"><span class="swatch ghost"></span> Outside scale</span>
+        <div class="stage-tools">
+          <label class="label-switch" for="label-mode">
+            <span>Labels</span>
+            <select id="label-mode">
+              <option value="notes" selected>Note names</option>
+              <option value="degrees">Scale degrees</option>
+            </select>
+          </label>
+          <div class="legend" aria-label="Fretboard legend">
+            <span class="key"><span class="swatch root"></span> Root</span>
+            <span class="key"><span class="swatch in-scale"></span> Scale tone</span>
+            <span class="key"><span class="swatch ghost"></span> Outside scale</span>
+            <span class="key degree-key" hidden><span class="swatch degree-flat"></span> Lowered from major</span>
+            <span class="key degree-key" hidden><span class="swatch degree-sharp"></span> Raised from major</span>
+          </div>
         </div>
       </header>
 

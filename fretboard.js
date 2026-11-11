@@ -17,7 +17,9 @@
     showAll: $('show-all'),
     position: $('position'),
     compare: $('compare-major'),
+    labelMode: $('label-mode'),
     board: $('fretboard'),
+    scaleDegrees: $('scale-degrees'),
     scaleNotes: $('scale-notes'),
     scaleTitle: $('scale-title'),
     badge: $('selftest'),
@@ -58,6 +60,9 @@
     const inScale = scaleSet(rootPc, def.steps);
     const compare = Boolean(els.compare?.checked);
     const inMajor = compare ? scaleSet(rootPc, SCALES.major.steps) : null;
+    const showDegrees = els.labelMode?.value === 'degrees';
+    const degrees = new Map(degreeLabelsFor(def).map((degree) => [(rootPc + degree.step) % 12, degree]));
+    document.querySelectorAll('.degree-key').forEach((key) => { key.hidden = !showDegrees; });
     if (modesPage) renderComparison(rootPc, scaleKey, flats, compare);
 
     els.fretsOut.textContent = String(fretCount);
@@ -67,6 +72,15 @@
     const noteNames = new Map(def.steps.map((step, index) => [(rootPc + step) % 12, spelled[index]]));
     els.scaleTitle.textContent = `${nameFor(rootPc, flats)} ${modesPage ? MODES[scaleKey].name : def.name}`;
     els.scaleNotes.textContent = spelled.join('  ·  ');
+    if (els.scaleDegrees) {
+      els.scaleDegrees.hidden = !showDegrees;
+      els.scaleDegrees.replaceChildren(...degreeLabelsFor(def).map((degree) => {
+        const chip = document.createElement('span');
+        chip.textContent = degree.label;
+        if (degree.altered) chip.className = `degree-${degree.direction}`;
+        return chip;
+      }));
+    }
     if (modesPage) {
       const pattern = modeStepPattern(def.steps);
       $('mode-pattern').textContent = pattern.join(' ');
@@ -138,7 +152,14 @@
           else if (inParallel) dot.classList.add('ghost', 'parallel');
           else dot.classList.add('ghost');
           if (compare && isIn && !isRoot && !inMajor.has(pc)) dot.classList.add('altered');
-          dot.textContent = isIn ? noteNames.get(pc) : nameFor(pc, flats);
+          const degree = degrees.get(pc);
+          if (showDegrees && isIn) {
+            dot.textContent = degree.label;
+            dot.title = noteNames.get(pc);
+            if (degree.altered) dot.classList.add(`degree-${degree.direction}`, degree.magnitude > 1 ? 'degree-double' : 'degree-single');
+          } else {
+            dot.textContent = isIn ? noteNames.get(pc) : nameFor(pc, flats);
+          }
           c.appendChild(dot);
         }
         grid.appendChild(c);
@@ -261,6 +282,7 @@
       els.showAll.addEventListener(ev, render);
       els.compare?.addEventListener(ev, render);
       els.position?.addEventListener(ev, render);
+      els.labelMode?.addEventListener(ev, render);
     });
     $('mode-strip')?.addEventListener('keydown', onStripKey);
   }
@@ -276,7 +298,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
-    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll, compare: els.compare, pos: els.position });
+    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll, compare: els.compare, pos: els.position, labels: els.labelMode });
     PageState.wireShare();
     $('play-controls')?.append(Playback.button(modesPage ? 'Play mode' : 'Play scale', (done) =>
       Playback.playMelody(Playback.scaleMidis(parseInt(els.root.value, 10), SCALES[els.scale.value].steps), done)));
