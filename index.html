@@ -7,6 +7,7 @@
   <title>Fretboard Lab — explore guitar scales across the neck</title>
   <meta name="description" content="A clean, interactive guitar fretboard for exploring accurate scale and mode notes across the neck. Defaults to G major." />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="lessons.css" />
 </head>
 <body>
   <a class="skip-link" href="#workspace">Skip to fretboard controls</a>
@@ -34,6 +35,7 @@
           <span class="nav-number">03</span> Progressions
         </a>
         <a href="modes.html"><span class="nav-number">04</span> Modes</a>
+        <a href="quiz.html"><span class="nav-number">05</span> Quiz</a>
       </nav>
 
       <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
@@ -84,35 +86,40 @@
           </label>
           <select id="scale"></select>
         </div>
-        <div class="control control-range">
-          <label for="frets">
-            <span class="control-label">Fret range</span>
-            <span class="control-value"><span id="frets-out">15</span> frets</span>
-          </label>
-          <input type="range" id="frets" min="12" max="24" step="1" value="15" />
-          <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
-        </div>
-        <div class="control">
-          <label for="spelling">
-            <span class="control-label">Note spelling</span>
-            <span class="control-help">Sharps or flats</span>
-          </label>
-          <select id="spelling">
-            <option value="auto" selected>Auto (by key)</option>
-            <option value="sharps">Sharps ♯</option>
-            <option value="flats">Flats ♭</option>
-          </select>
-        </div>
-        <div class="control control-check">
-          <input type="checkbox" id="show-all" />
-          <label for="show-all">
-            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-            <span class="toggle-copy">
-              <strong>Show every note</strong>
-              <small>Dim notes outside the scale</small>
-            </span>
-          </label>
-        </div>
+        <details class="practice-settings" data-responsive-details open>
+          <summary>Neck and display settings</summary>
+          <div class="settings-controls">
+            <div class="control control-range">
+              <label for="frets">
+                <span class="control-label">Fret range</span>
+                <span class="control-value"><span id="frets-out">15</span> frets</span>
+              </label>
+              <input type="range" id="frets" min="12" max="24" step="1" value="15" />
+              <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
+            </div>
+            <div class="control">
+              <label for="spelling">
+                <span class="control-label">Note spelling</span>
+                <span class="control-help">Sharps or flats</span>
+              </label>
+              <select id="spelling">
+                <option value="auto" selected>Auto (by key)</option>
+                <option value="sharps">Sharps ♯</option>
+                <option value="flats">Flats ♭</option>
+              </select>
+            </div>
+            <div class="control control-check">
+              <input type="checkbox" id="show-all" />
+              <label for="show-all">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span class="toggle-copy">
+                  <strong>Show every note</strong>
+                  <small>Dim notes outside the scale</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -147,36 +154,15 @@
       </footer>
     </section>
 
-    <section class="practice-panel" aria-labelledby="practice-heading">
+    <section id="lessons" class="lesson-panel" aria-labelledby="lessons-heading">
       <div class="section-heading">
         <div>
-          <h2 id="practice-heading">Turn the map into muscle memory</h2>
-          <p>A simple practice loop for moving from recognition to recall.</p>
+          <h2 id="lessons-heading">Learn scales</h2>
+          <p>Three short lessons that follow the key and scale you have selected above.</p>
         </div>
       </div>
-      <ol class="practice-steps">
-        <li>
-          <span class="step-number">1</span>
-          <div>
-            <h3>Anchor the root</h3>
-            <p>Find every highlighted root first. These are your landmarks across the neck.</p>
-          </div>
-        </li>
-        <li>
-          <span class="step-number">2</span>
-          <div>
-            <h3>Trace one string</h3>
-            <p>Follow the pattern horizontally, then connect the same notes vertically.</p>
-          </div>
-        </li>
-        <li>
-          <span class="step-number">3</span>
-          <div>
-            <h3>Play, then name</h3>
-            <p>Say each note aloud as you play it. Accuracy becomes instinct through repetition.</p>
-          </div>
-        </li>
-      </ol>
+      <div class="lesson-tabs" role="tablist" aria-label="Lesson level"></div>
+      <article id="lesson-body" class="lesson-body" role="tabpanel" aria-live="polite"></article>
     </section>
   </main>
 
@@ -189,7 +175,10 @@
     </p>
   </footer>
 
+  <script src="practice-layout.js"></script>
   <script src="fretboard.engine.js"></script>
+  <script src="lessons.js"></script>
+  <script src="lessons.ui.js"></script>
   <script src="fretboard.js"></script>
 </body>
 </html>

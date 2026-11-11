@@ -24,16 +24,16 @@
   const roots = ['C', 'C♯ / D♭', 'D', 'D♯ / E♭', 'E', 'F', 'F♯ / G♭', 'G', 'G♯ / A♭', 'A', 'A♯ / B♭', 'B'];
   const progressionSteps = () => els.progression.value.split(',').map((degree) => Number(degree) - 1);
 
-  function preferFlats(rootPc, scale) {
+  function preferFlats(rootPc) {
     if (els.spelling.value === 'flats') return true;
     if (els.spelling.value === 'sharps') return false;
-    return keyPrefersFlats(rootPc, scale.family);
+    return scalePrefersFlats(rootPc, els.scale.value);
   }
 
   function render() {
     const rootPc = Number(els.root.value);
     const scale = SCALES[els.scale.value];
-    const flats = preferFlats(rootPc, scale);
+    const flats = preferFlats(rootPc);
     const chords = diatonicChords(rootPc, scale, els.chordType.value === 'sevenths', flats);
     const fretCount = Number(els.frets.value);
     els.fretsOut.textContent = String(fretCount);
@@ -83,6 +83,9 @@
       return item;
     });
     els.progressionMap.replaceChildren(...progressionCards);
+    if (typeof LessonsUI !== 'undefined') {
+      LessonsUI.update('progressions', { rootPc, scaleKey: els.scale.value, flats, pattern: progressionSteps() });
+    }
   }
 
   function populate() {

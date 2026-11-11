@@ -1,0 +1,231 @@
+/* Lesson panel ------------------------------------------------------------ */
+.lesson-panel {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--cp-border);
+  border-radius: 1rem;
+  background: var(--cp-surface);
+}
+
+.lesson-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.25rem;
+  border-bottom: 1px solid var(--cp-border);
+  padding-bottom: 0.75rem;
+}
+
+.lesson-tabs [role="tab"] {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--cp-border);
+  border-radius: 999px;
+  background: var(--cp-surface-soft);
+  color: var(--cp-text-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lesson-tabs [role="tab"]:hover {
+  color: var(--cp-text);
+}
+
+.lesson-tabs [role="tab"][aria-selected="true"] {
+  background: var(--cp-accent-soft);
+  border-color: var(--cp-accent);
+  color: var(--cp-text);
+}
+
+.lesson-tabs [role="tab"]:focus-visible,
+.lesson-quiz:focus-visible,
+.mode-chip:focus-visible {
+  outline: 2px solid var(--cp-accent);
+  outline-offset: 2px;
+}
+
+.lesson-body {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 68ch;
+}
+
+.lesson-body p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.lesson-level {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cp-text-muted);
+}
+
+.lesson-title {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.35rem;
+}
+
+.lesson-summary {
+  color: var(--cp-text-muted);
+}
+
+.lesson-model {
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--cp-accent);
+  border-radius: 0.5rem;
+  background: var(--cp-surface-soft);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.lesson-model-label {
+  font-size: 0.9rem;
+  color: var(--cp-text-muted);
+}
+
+.lesson-model-label strong {
+  color: var(--cp-text);
+}
+
+.lesson-section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.lesson-section h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.lesson-note,
+.lesson-interval {
+  display: inline-block;
+  padding: 0 0.4em;
+  border-radius: 0.35em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lesson-note {
+  background: var(--cp-accent-soft);
+  color: var(--cp-text);
+}
+
+.lesson-interval {
+  border: 1px solid var(--cp-border);
+  color: var(--cp-text-muted);
+}
+
+.lesson-quiz {
+  justify-self: start;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  background: var(--cp-accent);
+  color: var(--cp-on-accent, #fff);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lesson-quiz:hover {
+  filter: brightness(1.08);
+}
+
+/* Mode order strip ------------------------------------------------------- */
+.mode-order-panel {
+  margin-top: 1.25rem;
+}
+
+.mode-order-panel h3 {
+  margin: 0 0 0.35rem;
+}
+
+.mode-relation {
+  margin: 0 0 0.9rem;
+  color: var(--cp-text-muted);
+}
+
+.mode-relation strong {
+  color: var(--cp-text);
+}
+
+.mode-strip-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+}
+
+.mode-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(7.5rem, 1fr));
+  gap: 0.5rem;
+  min-width: 56rem;
+}
+
+.mode-chip {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0.75rem;
+  min-height: 44px;
+  border: 1px solid var(--cp-border);
+  border-radius: 0.75rem;
+  background: var(--cp-surface-soft);
+  color: var(--cp-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mode-chip:hover {
+  border-color: var(--cp-accent);
+}
+
+.mode-chip[aria-pressed="true"] {
+  background: var(--cp-accent-soft);
+  border-color: var(--cp-accent);
+  box-shadow: inset 0 0 0 1px var(--cp-accent);
+}
+
+.mode-chip-degree {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--cp-text-muted);
+}
+
+.mode-chip-degree::before {
+  content: "Degree ";
+}
+
+.mode-chip-name {
+  font-weight: 700;
+}
+
+.mode-chip-tonic,
+.mode-chip-color {
+  font-size: 0.85rem;
+  color: var(--cp-text-muted);
+}
+
+.mode-chip-pattern {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 50rem) {
+  .lesson-panel {
+    padding: 1.1rem;
+  }
+
+  .mode-strip {
+    grid-template-columns: repeat(7, 9rem);
+    min-width: 0;
+  }
+}

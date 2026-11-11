@@ -7,6 +7,7 @@
   <title>Fretboard Lab — compare guitar chord qualities</title>
   <meta name="description" content="Compare major, minor, dominant, diminished, suspended, added, and augmented guitar chord tones across the whole fretboard." />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="lessons.css" />
 </head>
 <body>
   <a class="skip-link" href="#workspace">Skip to chord controls</a>
@@ -34,6 +35,7 @@
           <span class="nav-number">03</span> Progressions
         </a>
         <a href="modes.html"><span class="nav-number">04</span> Modes</a>
+        <a href="quiz.html"><span class="nav-number">05</span> Quiz</a>
       </nav>
 
       <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
@@ -77,36 +79,41 @@
           </label>
           <select id="root"></select>
         </div>
-        <div class="control control-range">
-          <label for="frets">
-            <span class="control-label">Fret range</span>
-            <span class="control-value"><span id="frets-out">12</span> frets</span>
-          </label>
-          <input type="range" id="frets" min="12" max="15" step="1" value="12" />
-          <div class="range-ends" aria-hidden="true"><span>12</span><span>15</span></div>
-        </div>
-        <div class="control">
-          <label for="spelling">
-            <span class="control-label">Note spelling</span>
-            <span class="control-help">Sharps or flats</span>
-          </label>
-          <select id="spelling">
-            <option value="auto" selected>Auto (by key)</option>
-            <option value="sharps">Sharps ♯</option>
-            <option value="flats">Flats ♭</option>
-          </select>
-        </div>
-        <div class="control control-primary">
-          <label for="label-mode">
-            <span class="control-label">Dot labels</span>
-            <span class="control-help">Notes, intervals, or both</span>
-          </label>
-          <select id="label-mode">
-            <option value="notes">Note names</option>
-            <option value="intervals">Intervals</option>
-            <option value="both" selected>Both</option>
-          </select>
-        </div>
+        <details class="practice-settings" data-responsive-details open>
+          <summary>Neck and display settings</summary>
+          <div class="settings-controls">
+            <div class="control control-range">
+              <label for="frets">
+                <span class="control-label">Fret range</span>
+                <span class="control-value"><span id="frets-out">12</span> frets</span>
+              </label>
+              <input type="range" id="frets" min="12" max="15" step="1" value="12" />
+              <div class="range-ends" aria-hidden="true"><span>12</span><span>15</span></div>
+            </div>
+            <div class="control">
+              <label for="spelling">
+                <span class="control-label">Note spelling</span>
+                <span class="control-help">Sharps or flats</span>
+              </label>
+              <select id="spelling">
+                <option value="auto" selected>Auto (by key)</option>
+                <option value="sharps">Sharps ♯</option>
+                <option value="flats">Flats ♭</option>
+              </select>
+            </div>
+            <div class="control control-primary">
+              <label for="label-mode">
+                <span class="control-label">Dot labels</span>
+                <span class="control-help">Notes, intervals, or both</span>
+              </label>
+              <select id="label-mode">
+                <option value="notes">Note names</option>
+                <option value="intervals">Intervals</option>
+                <option value="both" selected>Both</option>
+              </select>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -115,7 +122,6 @@
         <div>
           <h2 id="atlas-heading">Chord quality atlas</h2>
           <p class="stage-description">Each color represents a job inside the chord, not just a note name.</p>
-          <p class="stage-description">Dots show the note above its interval: R = root, 3 = third, 5 = fifth. Use Dot labels to switch views.</p>
         </div>
         <div class="legend interval-legend" aria-label="Interval color legend">
           <span class="key"><span class="swatch cat-root"></span> Root</span>
@@ -127,6 +133,7 @@
       </header>
 
       <section id="gallery" class="gallery" aria-label="Chord diagrams"></section>
+      <p class="stage-description">Dots show the note above its interval: R = root, 3 = third, 5 = fifth. Use Dot labels to switch views.</p>
 
       <footer class="stage-footer">
         <p id="selftest" class="selftest" role="status"></p>
@@ -134,36 +141,15 @@
       </footer>
     </section>
 
-    <section class="practice-panel" aria-labelledby="practice-heading">
+    <section id="lessons" class="lesson-panel" aria-labelledby="lessons-heading">
       <div class="section-heading">
         <div>
-          <h2 id="practice-heading">Understand what changes the sound</h2>
-          <p>Compare the same root while one interval changes at a time.</p>
+          <h2 id="lessons-heading">Learn chords</h2>
+          <p>Three short lessons that follow the root you have selected above.</p>
         </div>
       </div>
-      <ul class="practice-steps concept-list">
-        <li>
-          <span class="step-number">3rd</span>
-          <div>
-            <h3>Major or minor</h3>
-            <p>The third defines the chord's core mood. Compare 3 against ♭3 across the neck.</p>
-          </div>
-        </li>
-        <li>
-          <span class="step-number">5th</span>
-          <div>
-            <h3>Stable or altered</h3>
-            <p>Lower or raise the fifth to reveal diminished and augmented tension.</p>
-          </div>
-        </li>
-        <li>
-          <span class="step-number">7+</span>
-          <div>
-            <h3>Color and movement</h3>
-            <p>Sevenths and extensions add pull, atmosphere, and harmonic direction.</p>
-          </div>
-        </li>
-      </ul>
+      <div class="lesson-tabs" role="tablist" aria-label="Lesson level"></div>
+      <article id="lesson-body" class="lesson-body" role="tabpanel" aria-live="polite"></article>
     </section>
   </main>
 
@@ -176,7 +162,10 @@
     </p>
   </footer>
 
+  <script src="practice-layout.js"></script>
   <script src="fretboard.engine.js"></script>
+  <script src="lessons.js"></script>
+  <script src="lessons.ui.js"></script>
   <script src="chord-fretboard.js"></script>
   <script src="chords.js"></script>
 </body>

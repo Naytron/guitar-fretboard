@@ -72,6 +72,51 @@ const MODES = {
   locrian: { name: 'Locrian', parentOffset: 11 },
 };
 
+/* Scale-degree order of the modes: degree N of the parent major scale is MODE_ORDER[N-1]. */
+const MODE_ORDER = ['major', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'natural_minor', 'locrian'];
+
+/* Bright → dark: more raised degrees = brighter. Computed from the formulas, never typed. */
+const MODE_BRIGHTNESS = [...MODE_ORDER].sort(
+  (a, b) => SCALES[b].steps.reduce((t, s) => t + s, 0) - SCALES[a].steps.reduce((t, s) => t + s, 0),
+);
+
+function modeDegree(modeKey) {
+  const index = MODE_ORDER.indexOf(modeKey);
+  if (index < 0) throw new Error(`Unknown mode: ${modeKey}`);
+  return index + 1;
+}
+
+/* Pitch class of the major scale that shares this mode's notes (D Dorian → C). */
+function parentMajorPc(rootPc, modeKey) {
+  return (rootPc - MODES[modeKey].parentOffset + 12) % 12;
+}
+
+/* Degree labels relative to the parallel major: Dorian → 1 2 ♭3 4 5 6 ♭7. */
+function scaleDegreeLabels(scale) {
+  if (scale.steps.length !== 7) throw new Error(`Degree labels require a seven-note scale: ${scale.name}`);
+  return scale.steps.map((step, index) => {
+    const difference = step - SCALES.major.steps[index];
+    const accidental = difference < 0 ? '♭'.repeat(-difference) : '♯'.repeat(difference);
+    return `${accidental}${index + 1}`;
+  });
+}
+
+/*
+ * The tones that separate a mode from the plain major or natural-minor scale
+ * of its family. Ionian and Aeolian return [] because they ARE the references.
+ */
+function modeCharacteristics(modeKey) {
+  const scale = SCALES[modeKey];
+  const reference = SCALES[scale.family === 'minor' ? 'natural_minor' : 'major'];
+  const labels = scaleDegreeLabels(scale);
+  const referenceLabels = scaleDegreeLabels(reference);
+  return {
+    family: scale.family,
+    labels: labels.filter((label, index) => scale.steps[index] !== reference.steps[index]),
+    referenceLabels,
+  };
+}
+
 function modeStepPattern(steps) {
   return steps.map((step, index) => {
     const distance = (steps[index + 1] ?? 12) - step;
@@ -125,8 +170,7 @@ function intervalDegree(label) {
   return degrees[interval];
 }
 
-function spellChord(rootPc, chord, useFlats) {
-  const rootName = nameFor(rootPc, useFlats);
+function spellChord(rootPc, chord, useFlats, rootName = nameFor(rootPc, useFlats)) {
   const rootLetter = LETTERS.indexOf(rootName[0]);
   return chord.steps.map((step, index) => {
     const degree = intervalDegree(chord.labels[index]);
@@ -147,12 +191,26 @@ function spellChord(rootPc, chord, useFlats) {
   });
 }
 
+function scalePrefersFlats(rootPc, scaleKey) {
+  const mode = MODES[scaleKey];
+  return mode
+    ? keyPrefersFlats((rootPc - mode.parentOffset + 12) % 12, 'major')
+    : keyPrefersFlats(rootPc, SCALES[scaleKey].family);
+}
+
+function spellScale(rootPc, scale, useFlats) {
+  return scale.steps.length === 7
+    ? spellChord(rootPc, { steps: scale.steps, labels: ['R', '2', '3', '4', '5', '6', '7'] }, useFlats)
+    : scale.steps.map(step => nameFor((rootPc + step) % 12, useFlats));
+}
+
 function diatonicChords(rootPc, scale, useSevenths = false, useFlats = keyPrefersFlats(rootPc, scale.family)) {
   if (scale.steps.length !== 7) {
     throw new Error(`Diatonic progressions require a seven-note scale: ${scale.name}`);
   }
 
   const romanDegrees = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+  const scaleNames = spellScale(rootPc, scale, useFlats);
   const scaleStepAt = (degree) => scale.steps[degree % 7] + Math.floor(degree / 7) * 12;
 
   return romanDegrees.map((roman, degree) => {
@@ -194,7 +252,7 @@ function diatonicChords(rootPc, scale, useSevenths = false, useFlats = keyPrefer
       name,
       steps,
       labels,
-      notes: spellChord(root, chord, useFlats),
+      notes: spellChord(root, chord, useFlats, scaleNames[degree]),
     };
   });
 }
@@ -294,8 +352,9 @@ function runChordSelfTest() {
 /* Expose for Node-based testing while staying browser-friendly */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    SHARP, FLAT, STRINGS, SCALES, CHORDS, MODES, modeStepPattern,
-    keyPrefersFlats, nameFor, spellChord, diatonicChords, scaleSet, noteAt,
+    SHARP, FLAT, STRINGS, SCALES, CHORDS, MODES, MODE_ORDER, MODE_BRIGHTNESS, modeStepPattern,
+    modeDegree, parentMajorPc, scaleDegreeLabels, modeCharacteristics,
+    keyPrefersFlats, nameFor, spellChord, spellScale, scalePrefersFlats, diatonicChords, scaleSet, noteAt,
     intervalCategory, chordIntervals, runSelfTest, runChordSelfTest,
   };
 }

@@ -4,6 +4,8 @@ import { dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import './test-quiz.mjs';
+import './test-lessons.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
@@ -39,11 +41,21 @@ const JavaScriptFiles = [
   'chords.js',
   'chord-fretboard.js',
   'progressions.js',
+  'quiz.engine.js',
+  'quiz.js',
+  'lessons.js',
+  'lessons.ui.js',
+  'practice-layout.js',
+  'scripts/test-quiz.mjs',
+  'scripts/test-lessons.mjs',
   'scripts/build.mjs',
   'scripts/test.mjs',
   'scripts/verify-dist.mjs',
   'playwright.config.mjs',
   'tests/fretboard.spec.mjs',
+  'tests/quiz.spec.mjs',
+  'tests/mobile-practice.spec.mjs',
+  'tests/lessons.spec.mjs',
 ];
 
 for (const file of JavaScriptFiles) {
@@ -58,7 +70,7 @@ for (const file of JavaScriptFiles) {
   }
 }
 
-for (const file of ['index.html', 'chords.html', 'progressions.html', 'modes.html']) {
+for (const file of ['index.html', 'chords.html', 'progressions.html', 'modes.html', 'quiz.html']) {
   const html = await readFile(resolve(root, file), 'utf8');
   const hasVersion = html.includes('class="site-version" data-app-version');
   const hasInlineScript = /<script(?![^>]*\bsrc=)[^>]*>/i.test(html);

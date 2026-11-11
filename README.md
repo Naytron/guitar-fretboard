@@ -4,7 +4,7 @@ An interactive guitar fretboard that shows the **accurate note names** for any r
 mode, or basic chord — right across the neck. It defaults to the **G major scale**
 (G A B C D E F♯), reproducing a printed "G Major Scale — Fretboard" diagram as a live web page.
 
-There are **four interactive views**:
+There are **five interactive views**:
 - **Scales** (`index.html`) — any root + scale/mode/chord across the neck.
 - **Chords** (`chords.html`) — pick a root and see the major, minor, dominant, diminished,
   suspended, added, and augmented chords as full-neck maps, every tone **colored by interval**.
@@ -12,6 +12,8 @@ There are **four interactive views**:
   triads or seventh chords, Roman numerals, and common progression sequences.
 - **Modes** (`modes.html`) — choose a tonic and any of the seven diatonic modes. See its fretboard,
   complete W/H pattern, and note-to-note whole/half steps including the return to the octave.
+- **Quiz** (`quiz.html`) — ten-question, untimed lessons for fretboard notes, intervals,
+  chord tones, and Roman numerals, with explanations and separate missed-question review.
 
 **▶ Azure production:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/ &nbsp;·&nbsp;
 **Chords:** https://orange-grass-0f2e6e11e.7.azurestaticapps.net/chords.html &nbsp;·&nbsp;
@@ -51,7 +53,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite checks all four views' control interactions, chord interval spelling,
+The browser suite checks all five views' control interactions, chord interval spelling,
 progression calculations, keyboard navigation, and mobile-width layout. The fretboard itself remains horizontally scrollable on
 narrow screens so every fret stays legible.
 
@@ -63,6 +65,10 @@ selector still offers note-only and interval-only views.
 On **Modes**, the W/H summary stays visible above the neck. Expand **Explore the 7 note-to-note
 steps** below the fretboard for numbered, directional transitions. This keeps the neck closer
 to the controls, especially on phones.
+
+On small screens, secondary diagram settings are collapsed by default; expand **Neck and
+display settings** to change fret range, spelling, or dot labels. The active progression map appears
+before its collapsible seven-chord reference. Collapsing settings does not reset their values.
 
 ```powershell
 python -m http.server 8000 --directory dist
@@ -77,7 +83,7 @@ version.
   such as `v1.0.0+309bc9b`, and uploads the verified `dist/` artifact.
 - `.github/workflows/deploy.yml` is a reusable production workflow. A successful `main` CI run
   passes it the exact tested artifact, labels the deployment with the same version, deploys to
-  Azure Static Web Apps, and smoke-tests all four views plus `version.json`.
+  Azure Static Web Apps, and smoke-tests all five views plus `version.json`.
 - `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
 - `.azure/deployment-plan.md` records the Azure context, validation evidence, and rollback plan.
 
@@ -110,13 +116,71 @@ on all six strings in standard tuning. Choose 12–24 frets and note, interval, 
 These are full-neck tone maps rather than prescribed chord fingerings; on narrow screens the necks
 scroll horizontally and can be focused with the keyboard.
 
+## Quiz practice
+
+Open `quiz.html` and choose **Fretboard notes**, **Intervals**, **Chord tones**, or **Roman
+numerals**. Sessions are ten questions with no timer. Answer using the labeled buttons, or
+select a position in the **Find a note** exercise. On the interactive neck, arrow keys move,
+Home/End jump to the beginning/end, and Enter/Space submits. Feedback is announced and focus
+moves to Next; the learner controls when to continue.
+
+- **Notes:** start with natural notes on frets 0–5, on one or all strings. Expand to frets
+  0–12 and chromatic targets. Sharp/flat equivalents share one choice; finding either octave
+  position in the selected range is accepted. Standard six-string tuning only.
+- **Intervals:** identify ascending simple intervals from an open-string root through the
+  octave (0–12 semitones). Six semitones is called the tritone. These are visual questions,
+  not ear training.
+- **Chords:** start with major/minor triads. The harder setting adds diminished, augmented,
+  and dominant-seventh chords. Note names follow the selected key/spelling context.
+- **Roman numerals:** match degrees and chords in major or natural-minor keys using triads.
+  Modal harmony, seventh-chord numeral questions, and dedicated mode quizzes are not included.
+
+Scores count only unassisted first answers. A hint or reveal makes that question assisted.
+The results explain missed skills and offer a separate retry round without changing the original
+lesson score. A small question pool repeats only after exhaustion; the page explains when this
+happens. **Practice missed skills** starts a new lesson using the most recent saved lesson with
+misses. Ending a lesson early records no score.
+
+Quiz settings and up to 40 completed lesson summaries are stored under the versioned
+`fretboard-lab.quiz.v1` localStorage key. Review rounds are not added as new lesson scores.
+No account, server storage, analytics, or cross-device sync is used. Localhost, Azure, and the
+rollback site have separate storage. Private browsing, clearing site data, or switching browsers
+can erase/isolate progress. Storage failures or invalid saved data produce a visible notice;
+lessons can continue in memory. **Reset quiz progress** requires confirmation and removes only
+Quiz-owned data. In-progress lessons are not restored on reload. Scores are not a mastery rating.
+
+The shared theory engine preserves seven-note scale-degree spellings, including E♯ and B♯ in
+C♯ major and contextual diatonic chord roots. Sounding pitch classes remain unchanged.
+
+## Lessons and the mode order strip
+
+Every theory page (Scales, Chords, Progressions, Modes) ends with a **Learn** panel: three
+tabs — Beginner, Intermediate, Advanced — each built around a named mental model (the ladder,
+house numbers, Nashville numbers, the brightness dial, …). Lesson text is generated live from
+the engine for the key, scale, mode, or progression currently selected, so note examples are
+never hand-typed. Each lesson ends with a **Practice in Quiz** link that preselects the matching
+quiz activity and settings via URL query parameters (`quiz.html?activity=chords&key=2&advanced=true`);
+Quiz validates presets and ignores invalid ones. The chosen level is remembered per page under the
+`fretboard-lab.lessons.v1` localStorage key.
+
+The Modes page also shows **the seven modes in order** (Ionian → Locrian): each chip lists its
+degree, the tonic it starts on inside the current parent major key, its W/H step pattern, and its
+characteristic tone(s). Clicking a chip selects that mode and tonic; the sentence above it states
+"*X Mode* is degree *N* of *Y* major — same seven notes, new home."
+
 ## Files
 | File | Purpose |
 | --- | --- |
 | `index.html` | Scales page + controls |
 | `chords.html` | Chords page (interval-colored, full-neck) |
 | `progressions.html` | Diatonic chords and progression view |
-| `modes.html` | Modal fretboard and whole-step/half-step patterns |
+| `modes.html` | Modal fretboard, whole-step/half-step patterns, and mode order strip |
+| `quiz.html`, `quiz.css` | Accessible Quiz page and practice-specific styling |
+| `quiz.engine.js` | Pure question pools, grading, scoring, and review rounds |
+| `quiz.js` | Quiz UI, keyboard interaction, URL presets, and browser-only progress |
+| `lessons.js` | Lesson content (12 lessons), live context builder, and quiz-preset links |
+| `lessons.ui.js`, `lessons.css` | Accessible three-level lesson tab panel and mode strip styling |
+| `practice-layout.js` | Responsive native disclosures for diagram controls |
 | `les-paul.svg` | Locally served CC0 Les Paul illustration used in every hero |
 | `styles.css` | Fretboard + UI styling (all views) |
 | `theme.js` | Applies the light/dark theme before rendering |

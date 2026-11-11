@@ -52,7 +52,13 @@
       `<span class="chord-formula">${chord.labels.join(' ')}</span></p>`;
     card.appendChild(head);
 
-    card.appendChild(renderChordFretboard(rootPc, chord, notes, fretCount, labelMode));
+    const neck = document.createElement('div');
+    neck.className = 'chord-fretboard';
+    neck.tabIndex = 0;
+    neck.setAttribute('role', 'region');
+    neck.setAttribute('aria-label', `${rootName} ${chord.name} fretboard, scroll for more frets`);
+    neck.appendChild(renderChordFretboard(rootPc, chord, notes, fretCount, labelMode));
+    card.appendChild(neck);
     return card;
   }
 
@@ -92,6 +98,9 @@
     });
 
     els.gallery.replaceChildren(frag);
+    if (typeof LessonsUI !== 'undefined') {
+      LessonsUI.update('chords', { rootPc, flats: useFlatsFor(rootPc, 'major') });
+    }
   }
 
   /* ---- Wire up ---- */

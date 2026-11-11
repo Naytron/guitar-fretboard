@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="theme.js"></script>
+  <title>Fretboard Lab — Quiz</title>
+  <meta name="description" content="Practice fretboard notes, intervals, chord tones, and Roman numerals with short untimed quizzes." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="quiz.css" />
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to quiz</a>
+  <header class="site-header">
+    <div class="topbar">
+      <a class="brand" href="index.html"><span class="brand-copy"><strong>Fretboard Lab</strong><small>Guitar theory, made memorable</small></span></a>
+      <nav class="site-nav" aria-label="Diagram type">
+        <a href="index.html"><span class="nav-number">01</span> Scales</a>
+        <a href="chords.html"><span class="nav-number">02</span> Chords</a>
+        <a href="progressions.html"><span class="nav-number">03</span> Progressions</a>
+        <a href="modes.html"><span class="nav-number">04</span> Modes</a>
+        <a href="quiz.html" class="active" aria-current="page"><span class="nav-number">05</span> Quiz</a>
+      </nav>
+    </div>
+  </header>
+  <main id="workspace" class="workspace quiz-workspace">
+    <h1>Practice what you know.</h1>
+    <p id="storage-notice" role="status"></p>
+    <section id="quiz-setup" class="control-deck" aria-labelledby="setup-title">
+      <h2 id="setup-title">Choose your practice</h2>
+      <p>10 questions. No timer. Learn from each answer, then retry what you missed.</p>
+      <div id="activities" class="quiz-activities" role="group" aria-label="Quiz activity"></div>
+      <form id="quiz-settings">
+        <div class="quiz-settings-grid">
+          <label data-for="notes">Exercise
+            <select id="quiz-direction"><option value="name">Name the highlighted note</option><option value="find">Find a note on the neck</option></select>
+          </label>
+          <label data-for="notes intervals">Strings
+            <select id="quiz-string"><option value="all">All strings</option><option value="1">1 · high E</option><option value="2">2 · B</option><option value="3">3 · G</option><option value="4">4 · D</option><option value="5">5 · A</option><option value="6">6 · low E</option></select>
+          </label>
+          <label data-for="notes">Fret range
+            <select id="quiz-frets"><option value="5">0–5</option><option value="12">0–12</option></select>
+          </label>
+          <label data-for="notes">Target notes
+            <select id="quiz-notes"><option value="natural">Natural notes</option><option value="chromatic">All notes (sharps / flats)</option></select>
+          </label>
+          <label data-for="chords roman">Key
+            <select id="quiz-key"></select>
+          </label>
+          <label data-for="chords roman">Scale / spelling context
+            <select id="quiz-scale"><option value="major">Major</option><option value="natural_minor">Natural minor</option></select>
+          </label>
+          <label data-for="chords">Chord difficulty
+            <select id="quiz-advanced"><option value="false">Major / minor triads</option><option value="true">Add diminished, augmented, dominant 7</option></select>
+          </label>
+        </div>
+        <p id="activity-help"></p>
+        <p id="quiz-error" role="alert"></p>
+        <button class="quiz-primary" type="submit">Start 10-question lesson</button>
+      </form>
+    </section>
+    <section id="quiz-session" class="instrument-stage" aria-labelledby="question-title" hidden>
+      <p id="quiz-progress"></p>
+      <h2 id="question-title" tabindex="-1"></h2>
+      <p id="quiz-pool-note"></p>
+      <div id="quiz-board" class="quiz-board" role="group" aria-label="Question fretboard"></div>
+      <div id="quiz-options" class="quiz-options" role="group" aria-label="Answer choices"></div>
+      <div id="quiz-feedback" role="status"></div>
+      <div class="quiz-actions">
+        <button id="quiz-hint" type="button">Give me a hint</button>
+        <button id="quiz-reveal" type="button">Reveal answer</button>
+        <button id="quiz-next" class="quiz-primary" type="button" hidden>Next question</button>
+        <button id="quiz-end" type="button">End lesson</button>
+      </div>
+      <p id="quiz-hint-text"></p>
+      <p>Standard tuning. String 1 is high E. On location questions, use arrow keys to move and Enter or Space to answer.</p>
+    </section>
+    <section id="quiz-results" class="instrument-stage" aria-labelledby="results-title" hidden>
+      <h2 id="results-title" tabindex="-1"></h2>
+      <p id="quiz-score"></p>
+      <ul id="quiz-missed"></ul>
+      <button id="quiz-retry" type="button">Retry missed questions</button>
+      <button id="quiz-new" class="quiz-primary" type="button">Choose another lesson</button>
+    </section>
+    <section id="quiz-history" class="practice-panel" aria-labelledby="history-title">
+      <h2 id="history-title">Your recent practice</h2>
+      <p>Saved only in this browser on this site. No account or cross-device sync. Private browsing or clearing site data may erase progress. Scores describe these lessons, not mastery.</p>
+      <div id="quiz-history-list"></div>
+      <button id="quiz-practice-missed" type="button">Practice missed skills</button>
+      <button id="quiz-reset" type="button">Reset quiz progress</button>
+    </section>
+  </main>
+  <dialog id="quiz-confirm" aria-labelledby="confirm-title">
+    <h2 id="confirm-title">Reset quiz progress?</h2>
+    <p>This clears only Quiz settings and completed lessons in this browser. It cannot be undone.</p>
+    <form method="dialog"><button value="cancel">Cancel</button><button value="reset">Reset quiz progress</button></form>
+  </dialog>
+  <footer class="site-footer">
+    <p>Fretboard Lab · Practice through recall</p>
+    <span class="site-version" data-app-version>v1.0.0</span>
+  </footer>
+  <script src="fretboard.engine.js"></script>
+  <script src="quiz.engine.js"></script>
+  <script src="quiz.js"></script>
+</body>
+</html>

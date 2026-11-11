@@ -7,6 +7,7 @@
   <title>Fretboard Lab — map scale chord progressions</title>
   <meta name="description" content="Choose a key and scale to explore diatonic chords, Roman numerals, and common guitar chord progressions." />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="lessons.css" />
 </head>
 <body>
   <a class="skip-link" href="#workspace">Skip to progression controls</a>
@@ -22,6 +23,7 @@
         <a href="chords.html"><span class="nav-number">02</span> Chords</a>
         <a href="progressions.html" class="active" aria-current="page"><span class="nav-number">03</span> Progressions</a>
         <a href="modes.html"><span class="nav-number">04</span> Modes</a>
+        <a href="quiz.html"><span class="nav-number">05</span> Quiz</a>
       </nav>
       <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
         <span class="status-dot" aria-hidden="true"></span><span>Standard</span><strong>E A D G B E</strong>
@@ -62,22 +64,7 @@
           <label for="scale"><span class="control-label">Scale or mode</span><span class="control-help">Seven-note scales</span></label>
           <select id="scale"></select>
         </div>
-        <div class="control">
-          <label for="spelling"><span class="control-label">Note spelling</span><span class="control-help">Sharps or flats</span></label>
-          <select id="spelling">
-            <option value="auto" selected>Auto (by key)</option>
-            <option value="sharps">Sharps ♯</option>
-            <option value="flats">Flats ♭</option>
-          </select>
-        </div>
-        <div class="control">
-          <label for="chord-type"><span class="control-label">Chord tones</span><span class="control-help">Triads or seventh chords</span></label>
-          <select id="chord-type">
-            <option value="triads" selected>Triads</option>
-            <option value="sevenths">Seventh chords</option>
-          </select>
-        </div>
-        <div class="control">
+        <div class="control control-primary progression-choice">
           <label for="progression"><span class="control-label">Progression pattern</span><span class="control-help">Choose a common sequence</span></label>
           <select id="progression">
             <option value="1,4,5,1">Tonal turnaround</option>
@@ -87,30 +74,40 @@
             <option value="1,6,2,5">Circle-of-fifths cycle</option>
           </select>
         </div>
-        <div class="control control-range">
-          <label for="frets"><span class="control-label">Fret range</span><span class="control-value"><span id="frets-out">12</span> frets</span></label>
-          <input type="range" id="frets" min="12" max="24" step="1" value="12" />
-          <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
-        </div>
-        <div class="control">
-          <label for="label-mode"><span class="control-label">Dot labels</span><span class="control-help">Notes, intervals, or both</span></label>
-          <select id="label-mode">
-            <option value="notes">Note names</option>
-            <option value="intervals">Intervals</option>
-            <option value="both" selected>Both</option>
-          </select>
-        </div>
+        <details class="practice-settings" data-responsive-details open>
+          <summary>Neck and display settings</summary>
+          <div class="settings-controls">
+            <div class="control">
+              <label for="spelling"><span class="control-label">Note spelling</span><span class="control-help">Sharps or flats</span></label>
+              <select id="spelling">
+                <option value="auto" selected>Auto (by key)</option>
+                <option value="sharps">Sharps ♯</option>
+                <option value="flats">Flats ♭</option>
+              </select>
+            </div>
+            <div class="control">
+              <label for="chord-type"><span class="control-label">Chord tones</span><span class="control-help">Triads or seventh chords</span></label>
+              <select id="chord-type">
+                <option value="triads" selected>Triads</option>
+                <option value="sevenths">Seventh chords</option>
+              </select>
+            </div>
+            <div class="control control-range">
+              <label for="frets"><span class="control-label">Fret range</span><span class="control-value"><span id="frets-out">12</span> frets</span></label>
+              <input type="range" id="frets" min="12" max="24" step="1" value="12" />
+              <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
+            </div>
+            <div class="control">
+              <label for="label-mode"><span class="control-label">Dot labels</span><span class="control-help">Notes, intervals, or both</span></label>
+              <select id="label-mode">
+                <option value="notes">Note names</option>
+                <option value="intervals">Intervals</option>
+                <option value="both" selected>Both</option>
+              </select>
+            </div>
+          </div>
+        </details>
       </div>
-    </section>
-
-    <section class="instrument-stage progression-stage" aria-labelledby="diatonic-heading">
-      <header class="stage-header">
-        <div>
-          <h2 id="diatonic-heading">Chords in <span id="key-summary">G Major (Ionian)</span></h2>
-          <p class="stage-description">Each scale degree becomes a chord by stacking every other scale tone.</p>
-        </div>
-      </header>
-      <div id="diatonic-chords" class="diatonic-chords" aria-live="polite"></div>
     </section>
 
     <section class="instrument-stage progression-stage" aria-labelledby="progression-heading">
@@ -118,8 +115,6 @@
         <div>
           <h2 id="progression-heading">Progression map</h2>
           <p id="progression-caption" class="stage-description" aria-live="polite"></p>
-          <p class="stage-description">Each neck shows all positions of that chord's tones, not a single fingering. Scroll horizontally to explore more frets.</p>
-          <p class="stage-description">Dots show the note above its interval: R = root, 3 = third, 5 = fifth. Use Dot labels to switch views.</p>
         </div>
         <div class="legend interval-legend" aria-label="Interval color legend">
           <span class="key"><span class="swatch cat-root"></span> Root</span>
@@ -129,10 +124,35 @@
         </div>
       </header>
       <ol id="progression-map" class="progression-map" aria-label="Selected chord progression"></ol>
+      <p class="stage-description">Each neck shows all positions of that chord's tones, not a single fingering. Scroll horizontally to explore more frets.</p>
+      <p class="stage-description">Dots show the note above its interval: R = root, 3 = third, 5 = fifth. Use Dot labels to switch views.</p>
       <footer class="stage-footer">
         <p id="selftest" class="selftest" role="status"></p>
         <p class="math-note"><span aria-hidden="true">⌁</span> Roman numerals and chord tones follow the selected scale.</p>
       </footer>
+    </section>
+
+    <details class="instrument-stage progression-stage reference-details" data-responsive-details open>
+      <summary>Seven-chord scale reference</summary>
+      <section aria-labelledby="diatonic-heading">
+        <header class="stage-header">
+          <div>
+            <h2 id="diatonic-heading">Chords in <span id="key-summary">G Major (Ionian)</span></h2>
+            <p class="stage-description">Each scale degree becomes a chord by stacking every other scale tone.</p>
+          </div>
+        </header>
+        <div id="diatonic-chords" class="diatonic-chords" aria-live="polite"></div>
+      </section>
+    </details>
+    <section id="lessons" class="lesson-panel" aria-labelledby="lessons-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="lessons-heading">Learn progressions</h2>
+          <p>Three short lessons that follow the key, scale, and pattern you have selected above.</p>
+        </div>
+      </div>
+      <div class="lesson-tabs" role="tablist" aria-label="Lesson level"></div>
+      <article id="lesson-body" class="lesson-body" role="tabpanel" aria-live="polite"></article>
     </section>
   </main>
 
@@ -145,7 +165,10 @@
     </p>
   </footer>
 
+  <script src="practice-layout.js"></script>
   <script src="fretboard.engine.js"></script>
+  <script src="lessons.js"></script>
+  <script src="lessons.ui.js"></script>
   <script src="chord-fretboard.js"></script>
   <script src="progressions.js"></script>
 </body>

@@ -37,15 +37,11 @@
     els.frets.value = '15';
   }
 
-  function useFlatsFor(rootPc, family) {
+  function useFlatsFor(rootPc) {
     const mode = els.spelling.value;
     if (mode === 'sharps') return false;
     if (mode === 'flats') return true;
-    if (modesPage) {
-      const parentPc = (rootPc - MODES[els.scale.value].parentOffset + 12) % 12;
-      return keyPrefersFlats(parentPc, 'major');
-    }
-    return keyPrefersFlats(rootPc, family); // auto
+    return scalePrefersFlats(rootPc, els.scale.value);
   }
 
   /* ---- Render ---- */
@@ -55,15 +51,13 @@
     const def = SCALES[scaleKey];
     const fretCount = parseInt(els.frets.value, 10);
     const showAll = els.showAll.checked;
-    const flats = useFlatsFor(rootPc, def.family);
+    const flats = useFlatsFor(rootPc);
     const inScale = scaleSet(rootPc, def.steps);
 
     els.fretsOut.textContent = String(fretCount);
 
     // Readout of the selected scale's note names (accuracy at a glance)
-    const spelled = modesPage
-      ? spellChord(rootPc, { steps: def.steps, labels: ['R', '2', '3', '4', '5', '6', '7'] }, flats)
-      : def.steps.map((s) => nameFor((rootPc + s) % 12, flats));
+    const spelled = spellScale(rootPc, def, flats);
     const noteNames = new Map(def.steps.map((step, index) => [(rootPc + step) % 12, spelled[index]]));
     els.scaleTitle.textContent = `${nameFor(rootPc, flats)} ${modesPage ? MODES[scaleKey].name : def.name}`;
     els.scaleNotes.textContent = spelled.join('  ·  ');
@@ -92,6 +86,11 @@
         return item;
       });
       $('mode-steps').replaceChildren(...steps);
+      renderModeStrip(rootPc, scaleKey, flats);
+    }
+
+    if (typeof LessonsUI !== 'undefined') {
+      LessonsUI.update(modesPage ? 'modes' : 'scales', { rootPc, scaleKey, flats });
     }
 
     // Grid: 1 label column + (fretCount + 1) fret columns (0..N)
@@ -129,7 +128,7 @@
           if (isIn && isRoot) dot.classList.add('root');
           else if (isIn) dot.classList.add('in-scale');
           else dot.classList.add('ghost');
-          dot.textContent = modesPage && isIn ? noteNames.get(pc) : nameFor(pc, flats);
+          dot.textContent = isIn ? noteNames.get(pc) : nameFor(pc, flats);
           c.appendChild(dot);
         }
         grid.appendChild(c);
@@ -146,6 +145,60 @@
     return c;
   }
 
+  /* ---- Mode order strip: Ionian → Locrian, degree, pattern, and parent key ---- */
+  function renderModeStrip(rootPc, modeKey, flats) {
+    const strip = $('mode-strip');
+    const relation = $('mode-relation');
+    if (!strip || !relation) return;
+    const parentPc = parentMajorPc(rootPc, modeKey);
+    const parentName = nameFor(parentPc, flats);
+    const tonicName = spellScale(rootPc, SCALES[modeKey], flats)[0];
+    const parentNotes = spellScale(parentPc, SCALES.major, flats);
+    relation.replaceChildren();
+    const tonic = document.createElement('strong');
+    tonic.textContent = `${tonicName} ${MODES[modeKey].name}`;
+    const parent = document.createElement('strong');
+    parent.textContent = `${parentName} major`;
+    relation.append(tonic, ` is degree ${modeDegree(modeKey)} of `, parent, ' — same seven notes, new home.');
+
+    const buttons = MODE_ORDER.map((key, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'mode-chip';
+      button.value = key;
+      button.setAttribute('aria-pressed', String(key === modeKey));
+      button.tabIndex = key === modeKey ? 0 : -1;
+      const characteristic = modeCharacteristics(key).labels;
+      const degree = cell('mode-chip-degree', String(index + 1));
+      const name = cell('mode-chip-name', MODES[key].name);
+      const tonicNote = cell('mode-chip-tonic', `${parentNotes[index]} tonic`);
+      const pattern = cell('mode-chip-pattern', modeStepPattern(SCALES[key].steps).join(' '));
+      const color = cell('mode-chip-color', characteristic.length ? characteristic.join(' ') : SCALES[key].family === 'minor' ? 'minor reference' : 'major reference');
+      button.append(degree, name, tonicNote, pattern, color);
+      button.setAttribute('aria-label', `Degree ${index + 1}: ${parentNotes[index]} ${MODES[key].name}`);
+      button.addEventListener('click', () => {
+        els.scale.value = key;
+        els.root.value = String((parentPc + SCALES.major.steps[index]) % 12);
+        render();
+        strip.querySelector('[aria-pressed="true"]')?.focus();
+      });
+      return button;
+    });
+    strip.replaceChildren(...buttons);
+  }
+
+  function onStripKey(event) {
+    const buttons = [...event.currentTarget.querySelectorAll('.mode-chip')];
+    const index = buttons.indexOf(document.activeElement);
+    if (index < 0) return;
+    const moves = { ArrowRight: 1, ArrowLeft: -1, Home: -index, End: buttons.length - 1 - index };
+    if (!(event.key in moves)) return;
+    event.preventDefault();
+    const next = buttons[(index + moves[event.key] + buttons.length) % buttons.length];
+    buttons.forEach((button) => { button.tabIndex = button === next ? 0 : -1; });
+    next.focus();
+  }
+
   /* ---- Wire up ---- */
   function wire() {
     ['change', 'input'].forEach((ev) => {
@@ -155,6 +208,7 @@
       els.spelling.addEventListener(ev, render);
       els.showAll.addEventListener(ev, render);
     });
+    $('mode-strip')?.addEventListener('keydown', onStripKey);
   }
 
   function showSelfTest() {

@@ -12,9 +12,17 @@ const expectedFiles = [
   'fretboard.js',
   'index.html',
   'les-paul.svg',
+  'lessons.css',
+  'lessons.js',
+  'lessons.ui.js',
   'modes.html',
+  'practice-layout.js',
   'progressions.html',
   'progressions.js',
+  'quiz.css',
+  'quiz.engine.js',
+  'quiz.html',
+  'quiz.js',
   'staticwebapp.config.json',
   'styles.css',
   'theme.js',
@@ -41,7 +49,7 @@ if (metadata.source !== 'Naytron/guitar-fretboard') {
   throw new Error(`Unexpected version.json source: ${metadata.source}`);
 }
 
-for (const file of ['index.html', 'chords.html', 'progressions.html', 'modes.html']) {
+for (const file of ['index.html', 'chords.html', 'progressions.html', 'modes.html', 'quiz.html']) {
   const html = await readFile(resolve(dist, file), 'utf8');
   const label = `<span class="site-version" data-app-version>${metadata.version}</span>`;
   if (!html.includes(label)) {

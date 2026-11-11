@@ -296,6 +296,10 @@ for (const theme of ['light', 'dark']) {
         ));
         expect(Math.min(...fontSizes)).toBeGreaterThanOrEqual(14);
 
+        const advanced = page.locator('details').filter({ has: page.locator('#frets') });
+        if (await advanced.count() && !await advanced.evaluate(el => el.open)) {
+          await advanced.locator('summary').click();
+        }
         await page.locator('#frets').fill(file === 'chords' ? '15' : '24');
         const hasOverlappingDots = await page.locator('.fb-cell').evaluateAll(cells => cells.some(cell => {
           const dot = cell.querySelector('.note');

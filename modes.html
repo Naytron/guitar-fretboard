@@ -7,6 +7,7 @@
   <title>Fretboard Lab — explore modes and step patterns</title>
   <meta name="description" content="Explore all seven diatonic modes by key, with whole-step and half-step patterns and a guitar fretboard." />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="lessons.css" />
 </head>
 <body data-view="modes">
   <a class="skip-link" href="#workspace">Skip to mode controls</a>
@@ -21,6 +22,7 @@
         <a href="chords.html"><span class="nav-number">02</span> Chords</a>
         <a href="progressions.html"><span class="nav-number">03</span> Progressions</a>
         <a href="modes.html" class="active" aria-current="page"><span class="nav-number">04</span> Modes</a>
+        <a href="quiz.html"><span class="nav-number">05</span> Quiz</a>
       </nav>
       <div class="tuning-chip" aria-label="Standard tuning E A D G B E">
         <span class="status-dot" aria-hidden="true"></span><span>Standard</span><strong>E A D G B E</strong>
@@ -53,26 +55,31 @@
           <label for="scale"><span class="control-label">Mode</span><span class="control-help">Choose the modal pattern</span></label>
           <select id="scale"></select>
         </div>
-        <div class="control control-range">
-          <label for="frets"><span class="control-label">Fret range</span><span class="control-value"><span id="frets-out">15</span> frets</span></label>
-          <input type="range" id="frets" min="12" max="24" step="1" value="15" />
-          <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
-        </div>
-        <div class="control">
-          <label for="spelling"><span class="control-label">Note spelling</span><span class="control-help">Tonic spelling preference</span></label>
-          <select id="spelling">
-            <option value="auto" selected>Auto (by key)</option>
-            <option value="sharps">Sharps ♯</option>
-            <option value="flats">Flats ♭</option>
-          </select>
-        </div>
-        <div class="control control-check">
-          <input type="checkbox" id="show-all" />
-          <label for="show-all">
-            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-            <span class="toggle-copy"><strong>Show every note</strong><small>Dim notes outside the mode</small></span>
-          </label>
-        </div>
+        <details class="practice-settings" data-responsive-details open>
+          <summary>Neck and display settings</summary>
+          <div class="settings-controls">
+            <div class="control control-range">
+              <label for="frets"><span class="control-label">Fret range</span><span class="control-value"><span id="frets-out">15</span> frets</span></label>
+              <input type="range" id="frets" min="12" max="24" step="1" value="15" />
+              <div class="range-ends" aria-hidden="true"><span>12</span><span>24</span></div>
+            </div>
+            <div class="control">
+              <label for="spelling"><span class="control-label">Note spelling</span><span class="control-help">Tonic spelling preference</span></label>
+              <select id="spelling">
+                <option value="auto" selected>Auto (by key)</option>
+                <option value="sharps">Sharps ♯</option>
+                <option value="flats">Flats ♭</option>
+              </select>
+            </div>
+            <div class="control control-check">
+              <input type="checkbox" id="show-all" />
+              <label for="show-all">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span class="toggle-copy"><strong>Show every note</strong><small>Dim notes outside the mode</small></span>
+              </label>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
     <section class="instrument-stage" aria-labelledby="scale-title">
@@ -87,6 +94,11 @@
           <span class="key"><span class="swatch ghost"></span> Outside mode</span>
         </div>
       </header>
+      <div class="fretboard-shell">
+        <div class="shell-topline" aria-hidden="true"><span>High e ↑</span><span>Standard tuning</span><span>Low E ↓</span></div>
+        <section id="fretboard" class="fretboard" aria-label="Modal guitar fretboard" tabindex="0"></section>
+        <p class="scroll-hint">Swipe or scroll horizontally to explore more frets.</p>
+      </div>
       <section class="mode-pattern-panel" aria-labelledby="pattern-heading">
         <h3 id="pattern-heading">Whole-step and half-step pattern</h3>
         <p>W = whole step (2 frets). H = half step (1 fret). The final step returns to the tonic one octave higher.</p>
@@ -94,11 +106,13 @@
           <p id="mode-pattern" class="mode-pattern"></p>
         </div>
       </section>
-      <div class="fretboard-shell">
-        <div class="shell-topline" aria-hidden="true"><span>High e ↑</span><span>Standard tuning</span><span>Low E ↓</span></div>
-        <section id="fretboard" class="fretboard" aria-label="Modal guitar fretboard" tabindex="0"></section>
-        <p class="scroll-hint">Swipe or scroll horizontally to explore more frets.</p>
-      </div>
+      <section class="mode-order-panel" aria-labelledby="mode-order-heading">
+        <h3 id="mode-order-heading">The seven modes in order</h3>
+        <p id="mode-relation" class="mode-relation" aria-live="polite"></p>
+        <div class="mode-strip-scroll">
+          <div id="mode-strip" class="mode-strip" role="group" aria-label="Choose a mode by degree"></div>
+        </div>
+      </section>
       <details class="mode-details">
         <summary>Explore the 7 note-to-note steps</summary>
         <ol id="mode-steps" class="mode-steps" aria-label="Steps between successive mode notes" aria-live="polite"></ol>
@@ -108,12 +122,25 @@
         <p class="math-note">Every note and modal step is calculated from its interval formula.</p>
       </footer>
     </section>
+    <section id="lessons" class="lesson-panel" aria-labelledby="lessons-heading">
+      <div class="section-heading">
+        <div>
+          <h2 id="lessons-heading">Learn modes</h2>
+          <p>Three short lessons that follow the tonic and mode you have selected above.</p>
+        </div>
+      </div>
+      <div class="lesson-tabs" role="tablist" aria-label="Lesson level"></div>
+      <article id="lesson-body" class="lesson-body" role="tabpanel" aria-live="polite"></article>
+    </section>
   </main>
   <footer class="site-footer">
     <div class="footer-brand"><span class="footer-pick" aria-hidden="true"></span><strong>Fretboard Lab</strong></div>
     <p class="footer-meta"><span>Original note engine · Standard tuning · Built for focused practice</span><a class="image-credit" href="https://commons.wikimedia.org/wiki/File:Gibson_Les_Paul.svg">Les Paul art: piemaster · CC0</a><span class="version-chip">Version <span class="site-version" data-app-version>v1.0.0</span></span></p>
   </footer>
+  <script src="practice-layout.js"></script>
   <script src="fretboard.engine.js"></script>
+  <script src="lessons.js"></script>
+  <script src="lessons.ui.js"></script>
   <script src="fretboard.js"></script>
 </body>
 </html>

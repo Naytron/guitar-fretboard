@@ -53,6 +53,7 @@ jobs:
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/chords.html
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/progressions.html
           grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/modes.html
+          grep --fixed-strings --quiet "$EXPECTED_VERSION" dist/quiz.html
 
       - name: Deploy ${{ inputs.version }} to Azure
         id: azure_deploy
@@ -102,6 +103,14 @@ jobs:
             grep --fixed-strings --quiet 'id="selftest"'
           curl --fail --silent --show-error --location "${site_url}/modes.html" |
             grep --fixed-strings --quiet 'id="mode-pattern"'
+          curl --fail --silent --show-error --location "${site_url}/quiz.html" |
+            grep --fixed-strings --quiet 'id="quiz-session"'
+          curl --fail --silent --show-error --location "${site_url}/quiz.engine.js" |
+            grep --fixed-strings --quiet 'const QuizEngine'
+          curl --fail --silent --show-error --location "${site_url}/modes.html" |
+            grep --fixed-strings --quiet 'id="mode-strip"'
+          curl --fail --silent --show-error --location "${site_url}/lessons.js" |
+            grep --fixed-strings --quiet 'const Lessons'
 
       - name: Summarize deployment
         shell: bash
