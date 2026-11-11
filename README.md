@@ -85,6 +85,9 @@ version.
   passes it the exact tested artifact, labels the deployment with the same version, deploys to
   Azure Static Web Apps, and smoke-tests all five views plus `version.json`.
 - `azure.yaml` and `infra/` define the reproducible Azure Developer CLI and Bicep deployment.
+  Set `CUSTOM_DOMAIN` (azd environment variable and GitHub repository variable) to bind the apex
+  and `www` hostnames and smoke-test them; the full DNS runbook is in
+  `.azure/deployment-plan.md` under "Custom domain".
 - `.azure/deployment-plan.md` records the Azure context, validation evidence, and rollback plan.
 
 The Azure deployment token is stored only as the

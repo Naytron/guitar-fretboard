@@ -20,8 +20,8 @@ Deployed
 - Compliance: no special regulatory or organizational requirements
 - Subscription: the Visual Studio Enterprise subscription only
 - Location: West US 2
-- Hostname: Azure-provided HTTPS hostname
-- Custom domain: not in scope
+- Hostname: Azure-provided HTTPS hostname, plus an optional custom domain (see "Custom domain")
+- Custom domain: Cloudflare Registrar + Cloudflare DNS; apex and `www` bound to the Static Web App, `www` canonical
 - Rollback host: keep GitHub Pages enabled during Azure validation
 
 ## Architecture
@@ -242,6 +242,45 @@ will show the base package version.
 - The deployed page and `/version.json` report the same version label as the GitHub deployment.
 - No credential or deployment token appears in git or logs.
 - GitHub Pages remains available.
+
+## Custom domain
+
+Decisions: register and host DNS at Cloudflare (at-cost registration, free DNS, CNAME
+flattening at the apex). Serve both the apex and `www`; `www` is the Static Web App default
+hostname so the apex (and the `*.azurestaticapps.net` host) 301-redirect to it. The Free SKU
+allows two custom domains, which is exactly apex + `www`. Keep the Cloudflare proxy **off**
+(DNS-only) so Azure can validate ownership and issue its managed certificate.
+
+Runbook (replace `example.com` with the registered domain):
+
+1. Register the domain in Cloudflare → Domain Registration. Cloudflare becomes the DNS host.
+2. Create DNS records (Proxy status: DNS only):
+   - `CNAME  www  orange-grass-0f2e6e11e.7.azurestaticapps.net`
+   - `CNAME  @    orange-grass-0f2e6e11e.7.azurestaticapps.net` (Cloudflare flattens this)
+3. Add the hostnames to the Static Web App:
+   ```bash
+   az login
+   SWA=$(az staticwebapp list --resource-group rg-fretboard-lab-prod --query "[0].name" -o tsv)
+   az staticwebapp hostname set --name "$SWA" --resource-group rg-fretboard-lab-prod --hostname www.example.com
+   az staticwebapp hostname set --name "$SWA" --resource-group rg-fretboard-lab-prod --hostname example.com --validation-method dns-txt-token
+   az staticwebapp hostname show --name "$SWA" --resource-group rg-fretboard-lab-prod --hostname example.com --query validationToken -o tsv
+   ```
+   Add the printed token in Cloudflare as `TXT  @  <token>`, then wait until
+   `az staticwebapp hostname list ... --query "[].{host:name,status:status}"` shows both hosts `Ready`.
+4. Make `www` the default hostname (Azure Portal → Static Web App → Custom domains → `www.example.com`
+   → Set default). Azure then redirects the apex and the generated hostname to `www`.
+5. Record the domain for automation:
+   - GitHub repository variable `CUSTOM_DOMAIN=example.com` so `deploy.yml` smoke-tests the
+     `www` host and the apex redirect.
+   - `azd env set CUSTOM_DOMAIN example.com` so `infra/main.bicep` reproduces both bindings on
+     the next `azd provision` (the deployment fails if the DNS records above are missing).
+6. Update the README live links and add `<link rel="canonical">` tags pointing at `https://www.example.com/…`.
+7. Verify: `curl -I https://example.com/` returns `301` with `Location: https://www.example.com/`;
+   `curl https://www.example.com/version.json` matches the latest deployment; the CSP and other
+   security headers from `staticwebapp.config.json` are present on the custom host.
+
+Optional later: turn the Cloudflare proxy on for `www` after the Azure certificate is issued,
+with SSL mode "Full (strict)". Not required for launch.
 
 ## Rollback
 

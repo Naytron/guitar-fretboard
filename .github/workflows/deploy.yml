@@ -71,6 +71,7 @@ jobs:
         env:
           EXPECTED_VERSION: ${{ inputs.version }}
           SITE_URL: ${{ steps.azure_deploy.outputs.static_web_app_url }}
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
         run: |
           site_url="${SITE_URL%/}"
           if [[ "$site_url" != https://* ]]; then
@@ -105,6 +106,22 @@ jobs:
               exit 1
             fi
           }
+          # Optional custom domain: the www host must serve the same version and
+          # the apex must redirect to it.
+          if [[ -n "$CUSTOM_DOMAIN" ]]; then
+            curl --fail --silent --show-error --location \
+              "https://www.${CUSTOM_DOMAIN}/version.json" --output custom-version.json
+            custom_version="$(node -p "require('./custom-version.json').version")"
+            if [[ "$custom_version" != "$EXPECTED_VERSION" ]]; then
+              echo "https://www.${CUSTOM_DOMAIN} reports $custom_version instead of $EXPECTED_VERSION." >&2
+              exit 1
+            fi
+            apex_target="$(curl --silent --show-error --output /dev/null --write-out '%{redirect_url}' "https://${CUSTOM_DOMAIN}/")"
+            if [[ "$apex_target" != "https://www.${CUSTOM_DOMAIN}/"* ]]; then
+              echo "https://${CUSTOM_DOMAIN}/ redirects to '${apex_target}' instead of the www host." >&2
+              exit 1
+            fi
+          fi
           expect_marker index.html 'id="selftest"'
           expect_marker chords.html 'id="selftest"'
           expect_marker progressions.html 'id="selftest"'
