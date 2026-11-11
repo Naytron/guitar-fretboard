@@ -37,7 +37,7 @@ test('secondary text and accuracy badges retain readable contrast in both themes
 test('scale controls update the fretboard and keep labeled keyboard access', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByRole('status')).toContainText('note-accuracy self-test passed');
+  await expect(page.locator('#selftest')).toContainText('note-accuracy self-test passed');
   await page.keyboard.press('Tab');
   await expect(page.locator('.skip-link')).toBeFocused();
   await expect(page.locator('.skip-link')).toBeVisible();
@@ -58,7 +58,7 @@ test('scale controls update the fretboard and keep labeled keyboard access', asy
 test('chord controls render interval-spelled notes and all qualities', async ({ page }) => {
   await page.goto('/chords.html');
 
-  await expect(page.getByRole('status')).toContainText('chord-accuracy self-test passed');
+  await expect(page.locator('#selftest')).toContainText('chord-accuracy self-test passed');
   await expect(page.locator('.chord-card')).toHaveCount(9);
   await expect(page.getByLabel('Dot labels')).toHaveValue('both');
   await page.getByLabel('Root note').selectOption('0');
@@ -122,7 +122,7 @@ test('mobile layout keeps page width contained and fretboard scrollable', async 
 test('progression view maps selected scale degrees to chords and Roman numerals', async ({ page }) => {
   await page.goto('/progressions.html');
 
-  await expect(page.getByRole('status')).toContainText('chord-accuracy self-test passed');
+  await expect(page.locator('#selftest')).toContainText('chord-accuracy self-test passed');
   await expect(page.locator('.diatonic-card')).toHaveCount(7);
   await expect(page.locator('.diatonic-numeral')).toHaveText(['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°']);
   await page.locator('#root').selectOption('0');

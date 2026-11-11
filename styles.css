@@ -1012,6 +1012,13 @@ code {
   cursor: default;
 }
 
+.stage-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
 .play-button-small {
   min-height: 36px;
   padding: 0.25rem 0.75rem;
@@ -1226,7 +1233,8 @@ code {
   grid-column: 1 / -1;
 }
 
-.progression-controls .settings-controls {
+.progression-controls .settings-controls,
+.mode-controls .settings-controls {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
@@ -1515,7 +1523,8 @@ code {
   }
 
   .settings-controls,
-  .progression-controls .settings-controls {
+  .progression-controls .settings-controls,
+  .mode-controls .settings-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1727,7 +1736,8 @@ code {
   }
 
   .settings-controls,
-  .progression-controls .settings-controls {
+  .progression-controls .settings-controls,
+  .mode-controls .settings-controls {
     grid-template-columns: 1fr;
     margin-top: 0.75rem;
   }
@@ -1783,6 +1793,23 @@ code {
 
   .progression-stage .stage-header .stage-description {
     margin: 0;
+  }
+
+  .progression-stage .stage-header > .stage-tools {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .progression-stage .stage-tools .play-button {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-inline: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .progression-stage .stage-tools .legend {
+    justify-content: flex-start;
+    gap: 0.25rem 0.75rem;
   }
 
   .progression-position {

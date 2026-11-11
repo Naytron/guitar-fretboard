@@ -46,7 +46,7 @@
       <div class="section-heading">
         <div><h2 id="setup-heading">Choose your mode</h2><p>The key is the mode's tonic, not its parent major key.</p></div>
       </div>
-      <div class="controls" aria-label="Mode controls">
+      <div class="controls mode-controls" aria-label="Mode controls">
         <div class="control control-primary">
           <label for="root"><span class="control-label">Key</span><span class="control-help">Modal tonic</span></label>
           <select id="root"></select>
@@ -82,7 +82,7 @@
               <input type="checkbox" id="compare-major" />
               <label for="compare-major">
                 <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                <span class="toggle-copy"><strong>Compare with parallel major</strong><small>Ghost the major scale and mark altered degrees</small></span>
+                <span class="toggle-copy"><strong>Compare with major</strong><small>Mark altered degrees</small></span>
               </label>
             </div>
           </div>
@@ -92,10 +92,12 @@
     <section class="instrument-stage" aria-labelledby="scale-title">
       <header class="stage-header">
         <div class="readout" aria-live="polite">
-          <h2 id="scale-title" class="scale-title">G Ionian (major)</h2>
-          <p id="scale-notes" class="scale-notes"></p>
+          <div class="readout-row">
+            <h2 id="scale-title" class="scale-title">G Ionian (major)</h2>
+            <p id="scale-notes" class="scale-notes"></p>
             <div id="play-controls" class="play-controls"></div>
-            <p id="compare-summary" class="compare-summary" aria-live="polite" hidden></p>
+          </div>
+          <p id="compare-summary" class="compare-summary" aria-live="polite" hidden></p>
         </div>
         <div class="legend" aria-label="Fretboard legend">
           <span class="key"><span class="swatch root"></span> Tonic</span>

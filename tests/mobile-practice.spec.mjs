@@ -14,7 +14,7 @@ for (const theme of ['light', 'dark']) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(`/${view}.html?scoutTheme=${theme}`);
-      await expect(page.getByRole('status')).toContainText('self-test passed');
+      await expect(page.locator('#selftest')).toContainText('self-test passed');
 
       const firstString = await page.locator('.fb-string-label').first().boundingBox();
       expect(firstString.y).toBeGreaterThan(0);
