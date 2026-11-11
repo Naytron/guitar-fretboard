@@ -1234,8 +1234,12 @@ code {
 }
 
 .progression-controls .settings-controls,
-.mode-controls .settings-controls {
+.scale-controls .settings-controls {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mode-controls .settings-controls {
+  grid-template-columns: 1fr 1fr 1fr 1.35fr 1.35fr;
 }
 
 .progression-stage {
@@ -1524,6 +1528,7 @@ code {
 
   .settings-controls,
   .progression-controls .settings-controls,
+  .scale-controls .settings-controls,
   .mode-controls .settings-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1737,6 +1742,7 @@ code {
 
   .settings-controls,
   .progression-controls .settings-controls,
+  .scale-controls .settings-controls,
   .mode-controls .settings-controls {
     grid-template-columns: 1fr;
     margin-top: 0.75rem;
@@ -1848,6 +1854,12 @@ code {
   .toggle-thumb {
     transition: none;
   }
+}
+
+/* Position filter (Scales, Modes) */
+.note.out-of-position {
+  opacity: 0.22;
+  box-shadow: none;
 }
 
 /* Parallel-major comparison (Modes) */

@@ -15,6 +15,7 @@
     fretsOut: $('frets-out'),
     spelling: $('spelling'),
     showAll: $('show-all'),
+    position: $('position'),
     compare: $('compare-major'),
     board: $('fretboard'),
     scaleNotes: $('scale-notes'),
@@ -52,6 +53,7 @@
     const def = SCALES[scaleKey];
     const fretCount = parseInt(els.frets.value, 10);
     const showAll = els.showAll.checked;
+    const window = positionWindow(rootPc, els.position?.value, fretCount);
     const flats = useFlatsFor(rootPc);
     const inScale = scaleSet(rootPc, def.steps);
     const compare = Boolean(els.compare?.checked);
@@ -130,6 +132,7 @@
         if (isIn || showAll || inParallel) {
           const dot = document.createElement('span');
           dot.className = 'note';
+          if (window && (f < window.start || f > window.end)) dot.classList.add('out-of-position');
           if (isIn && isRoot) dot.classList.add('root');
           else if (isIn) dot.classList.add('in-scale');
           else if (inParallel) dot.classList.add('ghost', 'parallel');
@@ -151,6 +154,19 @@
     c.className = cls;
     if (text) c.textContent = text;
     return c;
+  }
+
+  /* ---- Position windows: five CAGED-style boxes anchored on the low-E root ---- */
+  const POSITION_OFFSETS = [0, 2, 4, 7, 9];
+  function positionWindow(rootPc, value, fretCount) {
+    const index = Number(value) - 1;
+    if (!Number.isInteger(index) || index < 0 || index >= POSITION_OFFSETS.length) return null;
+    const rootFret = (rootPc - STRINGS[0].pc + 12) % 12;
+    let start = rootFret + POSITION_OFFSETS[index] - 1;
+    if (start < 0) start += 12;
+    if (start + 4 > fretCount) start -= 12;
+    if (start < 0) start = 0;
+    return { start, end: start + 4 };
   }
 
   /* ---- Parallel-major comparison: legend keys and altered-degree summary ---- */
@@ -244,6 +260,7 @@
       els.spelling.addEventListener(ev, render);
       els.showAll.addEventListener(ev, render);
       els.compare?.addEventListener(ev, render);
+      els.position?.addEventListener(ev, render);
     });
     $('mode-strip')?.addEventListener('keydown', onStripKey);
   }
@@ -259,7 +276,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     populate();
-    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll, compare: els.compare });
+    PageState.bind({ key: els.root, [modesPage ? 'mode' : 'scale']: els.scale, frets: els.frets, spelling: els.spelling, all: els.showAll, compare: els.compare, pos: els.position });
     PageState.wireShare();
     $('play-controls')?.append(Playback.button(modesPage ? 'Play mode' : 'Play scale', (done) =>
       Playback.playMelody(Playback.scaleMidis(parseInt(els.root.value, 10), SCALES[els.scale.value].steps), done)));
